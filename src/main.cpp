@@ -1,6 +1,8 @@
+#pragma once
 #include <iostream>
 
 #include "Window.h"
+#include "Fractal_Renderer.cuh"
 
 void main() {
 	
@@ -8,15 +10,7 @@ void main() {
 
 	std::vector<Color> buffer(480 * 640);
 
-	for (int y = 0; y < window->height; ++y) {
-		for (int x = 0; x < window->width; ++x) {
-
-			Color color = { static_cast<int>(255 * (float(x) / float(window->width))), static_cast<int>(255 * (float(y) / float(window->height))), 255};
-
-			buffer[y * window->width + x] = color;
-
-		}
-	}
+	generateFractalGPU(buffer, window->width, window->height);
 
 	window->Draw(buffer);
 

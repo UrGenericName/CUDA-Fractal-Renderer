@@ -2,14 +2,9 @@
 
 #include <Windows.h>
 #include <vector>
+#include "Color.h"
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-struct Color {
-	unsigned char b = 0;
-	unsigned char g = 0;
-	unsigned char r = 0;
-};
 
 class Window {
 public:
@@ -25,8 +20,13 @@ public:
 
 private:
 
-	const wchar_t* CLASS_NAME;
+	const wchar_t* PARENT_CLASS_NAME = L"PARENT";
+	const wchar_t* SIDE_PANEL_CLASS_NAME = L"SIDE_PANEL";
+
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
+	HWND m_hSidePanel;
 
+	void CreateParent(const wchar_t* title);
+	void CreateSidePanel();
 };

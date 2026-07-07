@@ -2,6 +2,9 @@
 #include "Window.h"
 
 #include <assert.h>
+#include <string>
+
+using namespace std;
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
@@ -22,16 +25,26 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 Window::Window(const wchar_t* title, int i_width, int i_height) : m_hInstance(GetModuleHandle(nullptr)), width(i_width), height(i_height) {
 
-	CLASS_NAME = title;
+	CreateParent(L"Parent");
+	CreateSidePanel();
 
-	WNDCLASS wndClass = {};
-	wndClass.lpszClassName = CLASS_NAME;
-	wndClass.hInstance = m_hInstance;
-	wndClass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndClass.lpfnWndProc = WindowProc;
+	ShowWindow(m_hWnd, SW_SHOW);
+}
 
-	RegisterClass(&wndClass);
+Window::~Window() {
+	UnregisterClass(PARENT_CLASS_NAME, m_hInstance);
+}
+
+void Window::CreateParent(const wchar_t* title) {
+
+	WNDCLASS parentClass = {};
+	parentClass.lpszClassName = PARENT_CLASS_NAME;
+	parentClass.hInstance = m_hInstance;
+	parentClass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+	parentClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	parentClass.lpfnWndProc = WindowProc;
+
+	RegisterClass(&parentClass);
 
 	DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
@@ -45,27 +58,41 @@ Window::Window(const wchar_t* title, int i_width, int i_height) : m_hInstance(Ge
 
 	m_hWnd = CreateWindowEx(
 		0,
-		CLASS_NAME,
-		title,
+		PARENT_CLASS_NAME, title,
 		style,
-		rect.left,
-		rect.top,
-		rect.right - rect.left,
-		rect.bottom - rect.top,
-		NULL,
-		NULL,
-		m_hInstance,
-		NULL
+		rect.left, rect.top,
+		rect.right - rect.left, rect.bottom - rect.top,
+		NULL, NULL, m_hInstance, NULL
 	);
 
-	ShowWindow(m_hWnd, SW_SHOW);
 }
 
-Window::~Window() {
-	UnregisterClass(CLASS_NAME, m_hInstance);
+void Window::CreateSidePanel() {
+
+	WNDCLASS sidePanelClass = {};
+	sidePanelClass.lpszClassName = SIDE_PANEL_CLASS_NAME;
+	sidePanelClass.hInstance = m_hInstance;
+	sidePanelClass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+	sidePanelClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	sidePanelClass.lpfnWndProc = WindowProc;
+
+	RegisterClass(&sidePanelClass);
+
+	DWORD style = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN;
+	int sidebarWidth = 250;
+
+	m_hSidePanel = CreateWindowEx(
+		0,
+		SIDE_PANEL_CLASS_NAME,
+		L"",
+		style,
+		10, 10, sidebarWidth - 20, 200,
+		m_hWnd, (HMENU)101, m_hInstance, NULL
+	);
+
 }
 
-void Window::Draw(std::vector<Color>& buffer) {
+void Window::Draw(vector<Color>& buffer) {
 
 	assert(buffer.size() == width * height);
 
