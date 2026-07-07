@@ -2,15 +2,15 @@
 #include <iostream>
 
 #include "Window.h"
-#include "Fractal_Renderer.cuh"
+#include "FractalRenderer.h"
 
 void main() {
 	
 	Window* window = new Window();
+	FractalRenderer fractalRenderer{ window->width, window->height };
 
 	std::vector<Color> buffer(480 * 640);
-
-	generateFractalGPU(buffer, window->width, window->height);
+	fractalRenderer.generate(buffer);
 
 	window->Draw(buffer);
 

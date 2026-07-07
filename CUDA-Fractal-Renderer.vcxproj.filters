@@ -7,6 +7,7 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FractalRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -23,9 +24,6 @@
     <ClInclude Include="src\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Fractal_Renderer.cuh" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="src\Fractal_Renderer.cu" />
+    <ClInclude Include="src\FractalRenderer.h" />
   </ItemGroup>
 </Project>
