@@ -1,7 +1,9 @@
 #pragma once
+#pragma comment(lib, "Msimg32.lib") 
 #include "Window.h"
 
 #include <assert.h>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -10,13 +12,14 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 	switch (uMsg)
 	{
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		break;
 
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
+		case WM_CLOSE:
+			DestroyWindow(hWnd);
+			break;
+
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -89,6 +92,103 @@ void Window::CreateSidePanel() {
 		10, 10, sidebarWidth - 20, 200,
 		m_hWnd, (HMENU)101, m_hInstance, NULL
 	);
+
+}
+
+void Window::ZoomDragHandler(FractalRenderer& fractalRenderer) {
+
+	if (GetForegroundWindow() != m_hWnd) return;
+
+	static bool firstClick = true;
+	static POINT initalCursorPos;
+	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) 
+	{
+
+		// INITAL POINT
+		if (firstClick) {
+			firstClick = false;
+
+			GetCursorPos(&initalCursorPos);
+			ScreenToClient(m_hWnd, &initalCursorPos);
+		}
+
+		// DRAG BOX
+		POINT currentCursorPos;
+		GetCursorPos(&currentCursorPos);
+		ScreenToClient(m_hWnd, &currentCursorPos);
+		DrawDragBox(initalCursorPos, currentCursorPos);
+	}
+	else 
+	{	
+		// END POINT
+		if (!firstClick) {
+			firstClick = true;
+
+			POINT endCursorPos;
+			GetCursorPos(&endCursorPos);
+			ScreenToClient(m_hWnd, &endCursorPos);
+
+			double x_min, x_max;
+			x_max = max(static_cast<float>(initalCursorPos.x) / width, static_cast<float>(endCursorPos.x) / width);
+			x_min = min(static_cast<float>(initalCursorPos.x) / width, static_cast<float>(endCursorPos.x) / width);
+
+			double y_min, y_max;
+			y_max = max(static_cast<float>(initalCursorPos.y) / height, static_cast<float>(endCursorPos.y) / height);
+			y_min = min(static_cast<float>(initalCursorPos.y) / height, static_cast<float>(endCursorPos.y) / height);
+
+			double x_dif = fractalRenderer.x_max - fractalRenderer.x_min;
+			fractalRenderer.x_max = fractalRenderer.x_min + x_dif * x_max;
+			fractalRenderer.x_min = fractalRenderer.x_min + x_dif * x_min;
+
+			double y_dif = fractalRenderer.y_max - fractalRenderer.y_min;
+			fractalRenderer.y_max = fractalRenderer.y_min + y_dif * y_max;
+			fractalRenderer.y_min = fractalRenderer.y_min + y_dif * y_min;
+
+		}
+	}
+
+}
+
+void Window::DrawDragBox(POINT initalCursorPos, POINT endCursorPos) {
+
+	HDC hdc = GetDC(m_hWnd);
+	if (!hdc) return;
+
+	int left = min(initalCursorPos.x, endCursorPos.x);
+	int right = max(initalCursorPos.x, endCursorPos.x);
+	int bottom = max(initalCursorPos.y, endCursorPos.y);
+	int top = min(initalCursorPos.y, endCursorPos.y);
+
+	printf("%d\n", top);
+
+	int rectWidth = right - left;
+	int rectHeight = bottom - top;
+
+	HDC memDC = CreateCompatibleDC(hdc);
+	HBITMAP memBitmap = CreateCompatibleBitmap(hdc, rectWidth, rectHeight);
+	HGDIOBJ oldBitmap = SelectObject(memDC, memBitmap);
+
+	HBRUSH blueBrush = CreateSolidBrush(DRAG_COLOR);
+	RECT tempRect = { 0, 0, rectWidth, rectHeight };
+	FillRect(memDC, &tempRect, blueBrush);
+
+	BLENDFUNCTION blend = {};
+	blend.BlendOp = AC_SRC_OVER;
+	blend.BlendFlags = 0;
+	blend.SourceConstantAlpha = DRAG_OPACITY;
+	blend.AlphaFormat = 0;
+
+	AlphaBlend(
+		hdc, left, top, rectWidth, rectHeight,
+		memDC, 0, 0, rectWidth, rectHeight,
+		blend
+	);
+
+	DeleteObject(blueBrush);
+	SelectObject(memDC, oldBitmap);
+	DeleteObject(memBitmap);
+	DeleteDC(memDC);
+	ReleaseDC(m_hWnd, hdc);
 
 }
 

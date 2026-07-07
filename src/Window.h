@@ -3,6 +3,10 @@
 #include <Windows.h>
 #include <vector>
 #include "Color.h"
+#include "FractalRenderer.h"
+
+#define DRAG_COLOR RGB(0, 255, 255)
+#define DRAG_OPACITY 75
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -17,6 +21,7 @@ public:
 	~Window();
 
 	bool ProcessMessages();
+	void ZoomDragHandler(FractalRenderer& fractalRenderer);
 
 private:
 
@@ -29,4 +34,6 @@ private:
 
 	void CreateParent(const wchar_t* title);
 	void CreateSidePanel();
+	void DrawDragBox(POINT initalCursorPos, POINT endCursorPos);
+
 };

@@ -11,11 +11,15 @@ void main() {
 
 	std::vector<Color> buffer(480 * 640);
 	fractalRenderer.generate(buffer);
-
 	window->Draw(buffer);
 
 	bool running = true;
 	while (running) {
+
+		fractalRenderer.generate(buffer);
+		window->Draw(buffer);
+
+		window->ZoomDragHandler(fractalRenderer);
 
 		if (!window->ProcessMessages()) {
 			running = false;
