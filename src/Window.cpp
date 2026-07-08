@@ -1,11 +1,15 @@
 #pragma once
 #include "Window.h"
 
+#include "imgui.h"
+#include "rlImGui.h"
+
 using namespace std;
 
 Window::Window(const char* title, int i_width, int i_height) : width(i_width), height(i_height) {
 	
 	InitWindow(width, height, title);
+	rlImGuiSetup(true);
 	SetTargetFPS(60);
 
 }
