@@ -85,7 +85,18 @@ void FractalRenderer::calculatePixelGroup(vector<Color>& buffer, unsigned int of
         }
 
         Color color = { 0, 0, 0, 255 };
-        if (iteration <= maxIterations) color = { 0, static_cast<unsigned char>(255 * ((float)iteration / (float)maxIterations)), static_cast<unsigned char>(255 * ((float)iteration / (float)maxIterations)), 255 };
+
+        if (iteration <= maxIterations) {
+
+            float hue = ((float)iteration / (float)maxIterations);
+            unsigned char brightness = static_cast<unsigned char>(255.0f * hue);
+
+            color = { 0, 0, brightness, 255 };
+
+            Vector3 getHue = ColorToHSV(color);
+            color = ColorFromHSV(getHue.x + ((1.0f - hue) * 360.0f), getHue.y, -((getHue.z - 1.0f) * (getHue.z - 1.0f)) + 1);
+
+        }
 
         buffer[y * width + x] = color;
     }
