@@ -6,10 +6,10 @@
 
 void main() {
 	
-	Window* window = new Window();
+	Window* window = new Window{ L"Window", 960, 540 };
 	FractalRenderer fractalRenderer{ window->width, window->height };
 
-	std::vector<Color> buffer(480 * 640);
+	std::vector<Color> buffer{ static_cast<unsigned int>(window->width * window->height) };
 	fractalRenderer.generate(buffer);
 	window->Draw(buffer);
 

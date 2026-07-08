@@ -52,8 +52,8 @@ void Window::CreateParent(const wchar_t* title) {
 	DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
 	RECT rect;
-	rect.left = 250;
-	rect.top = 250;
+	rect.left = 60;
+	rect.top = 60;
 	rect.right = rect.left + width;
 	rect.bottom = rect.top + height;
 
@@ -116,6 +116,7 @@ void Window::ZoomDragHandler(FractalRenderer& fractalRenderer) {
 		POINT currentCursorPos;
 		GetCursorPos(&currentCursorPos);
 		ScreenToClient(m_hWnd, &currentCursorPos);
+
 		DrawDragBox(initalCursorPos, currentCursorPos);
 	}
 	else 
@@ -128,21 +129,29 @@ void Window::ZoomDragHandler(FractalRenderer& fractalRenderer) {
 			GetCursorPos(&endCursorPos);
 			ScreenToClient(m_hWnd, &endCursorPos);
 
-			double x_min, x_max;
-			x_max = max(static_cast<float>(initalCursorPos.x) / width, static_cast<float>(endCursorPos.x) / width);
-			x_min = min(static_cast<float>(initalCursorPos.x) / width, static_cast<float>(endCursorPos.x) / width);
+			double x_local_min, x_local_max;
+			x_local_max = max(static_cast<double>(initalCursorPos.x) / width, static_cast<double>(endCursorPos.x) / width) * 2.0f - 1.0f;
+			x_local_min = min(static_cast<double>(initalCursorPos.x) / width, static_cast<double>(endCursorPos.x) / width) * 2.0f - 1.0f;
 
-			double y_min, y_max;
-			y_max = max(static_cast<float>(initalCursorPos.y) / height, static_cast<float>(endCursorPos.y) / height);
-			y_min = min(static_cast<float>(initalCursorPos.y) / height, static_cast<float>(endCursorPos.y) / height);
+			double y_local_min, y_local_max;
+			y_local_max = max(static_cast<double>(initalCursorPos.y) / height, static_cast<double>(endCursorPos.y) / height) * 2.0f - 1.0f;
+			y_local_min = min(static_cast<double>(initalCursorPos.y) / height, static_cast<double>(endCursorPos.y) / height) * 2.0f - 1.0f;
 
-			double x_dif = fractalRenderer.x_max - fractalRenderer.x_min;
-			fractalRenderer.x_max = fractalRenderer.x_min + x_dif * x_max;
-			fractalRenderer.x_min = fractalRenderer.x_min + x_dif * x_min;
+			double x_current_global_pos = (fractalRenderer.x_min + fractalRenderer.x_max) / 2.0f;
+			double y_current_global_pos = (fractalRenderer.y_min + fractalRenderer.y_max) / 2.0f;
 
-			double y_dif = fractalRenderer.y_max - fractalRenderer.y_min;
-			fractalRenderer.y_max = fractalRenderer.y_min + y_dif * y_max;
-			fractalRenderer.y_min = fractalRenderer.y_min + y_dif * y_min;
+			double x_current_global_max_centered = fractalRenderer.x_max - x_current_global_pos;
+			double y_current_global_max_centered = fractalRenderer.y_max - y_current_global_pos;
+
+			double x_new_global_max = x_local_max * x_current_global_max_centered + x_current_global_pos;
+			double x_new_global_min = x_local_min * x_current_global_max_centered + x_current_global_pos;
+			double y_new_global_max = y_local_max * y_current_global_max_centered + y_current_global_pos;
+			double y_new_global_min = y_local_min * y_current_global_max_centered + y_current_global_pos;
+
+			fractalRenderer.x_max = x_new_global_max;
+			fractalRenderer.x_min = x_new_global_min;
+			fractalRenderer.y_max = y_new_global_max;
+			fractalRenderer.y_min = y_new_global_min;
 
 		}
 	}
@@ -154,12 +163,11 @@ void Window::DrawDragBox(POINT initalCursorPos, POINT endCursorPos) {
 	HDC hdc = GetDC(m_hWnd);
 	if (!hdc) return;
 
+	// RECT VARIABLES
 	int left = min(initalCursorPos.x, endCursorPos.x);
 	int right = max(initalCursorPos.x, endCursorPos.x);
 	int bottom = max(initalCursorPos.y, endCursorPos.y);
 	int top = min(initalCursorPos.y, endCursorPos.y);
-
-	printf("%d\n", top);
 
 	int rectWidth = right - left;
 	int rectHeight = bottom - top;
@@ -172,6 +180,7 @@ void Window::DrawDragBox(POINT initalCursorPos, POINT endCursorPos) {
 	RECT tempRect = { 0, 0, rectWidth, rectHeight };
 	FillRect(memDC, &tempRect, blueBrush);
 
+	// TRANSPARENCY STUFF
 	BLENDFUNCTION blend = {};
 	blend.BlendOp = AC_SRC_OVER;
 	blend.BlendFlags = 0;
@@ -184,6 +193,7 @@ void Window::DrawDragBox(POINT initalCursorPos, POINT endCursorPos) {
 		blend
 	);
 
+	// DEALLOCATE
 	DeleteObject(blueBrush);
 	SelectObject(memDC, oldBitmap);
 	DeleteObject(memBitmap);

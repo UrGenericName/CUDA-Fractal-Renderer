@@ -15,7 +15,6 @@ void FractalRenderer::generate(std::vector<Color>& buffer) {
             float zx = 0.0f;
             float zy = 0.0f;
             int iteration = 0;
-            const int MAX_ITERATIONS = 20;
 
             while ((zx * zx + zy * zy) <= 4.0f && iteration < MAX_ITERATIONS) {
                 float next_zx = (zx * zx) - (zy * zy) + cx;
@@ -25,8 +24,10 @@ void FractalRenderer::generate(std::vector<Color>& buffer) {
                 iteration++;
             }
 
+
+
             Color color = { 0, 0, 0 };
-            if (iteration == 20) color = { 255, 0, 0 };
+            if (iteration <= MAX_ITERATIONS) color = { static_cast<unsigned char>(255 * ((float)iteration / (float)MAX_ITERATIONS)), 0, 0};
 
             buffer[y * width + x] = color;
 

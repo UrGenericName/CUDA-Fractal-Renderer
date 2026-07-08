@@ -6,7 +6,7 @@ class FractalRenderer {
 public:
 
 	double x_max = 1.0f;
-	double x_min = -1.0f;
+	double x_min = -1.5f;
 
 	double y_max = 1.0f;
 	double y_min = -1.0f;
@@ -17,4 +17,6 @@ public:
 private:
 	int width;
 	int height;
+
+	int MAX_ITERATIONS = 50;
 };
