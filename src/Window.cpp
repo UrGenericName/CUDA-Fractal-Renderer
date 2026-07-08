@@ -9,8 +9,10 @@ using namespace std;
 Window::Window(const char* title, int i_width, int i_height) : width(i_width), height(i_height) {
 	
 	InitWindow(width, height, title);
-	rlImGuiSetup(true);
 	SetTargetFPS(60);
+
+	Image dummyImage = { nullptr, width, height, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
+	screenBuffer = LoadTextureFromImage(dummyImage);
 
 }
 
@@ -20,21 +22,19 @@ Window::~Window() {
 
 }
 
-void Window::Draw(std::vector<Color>& buffer) {
+void Window::Draw(FractalRenderer& fractalRenderer) {
 
 	ClearBackground(BLACK);
+	UpdateTexture(screenBuffer, fractalRenderer.buffer.data());
+	DrawTexture(screenBuffer, 0, 0, WHITE);
 
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-
-			DrawPixel(x, y, buffer[y * width + x]);
-
-		}
-	}
+	ZoomHandler(fractalRenderer);
 
 }
 
 void Window::ZoomHandler(FractalRenderer& fractalRenderer) {
+
+	if (ImGui::GetIO().WantCaptureMouse) return;
 
 	// DRAGGING
 	static bool firstClick = true;

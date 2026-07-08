@@ -17,11 +17,13 @@ public:
 	Window(const char* title, int i_width, int i_height);
 	~Window();
 
-	void Draw(std::vector<Color>& buffer);
-	void ZoomHandler(FractalRenderer& fractalRenderer);
+	void Draw(FractalRenderer& fractalRenderer);
 
 private:
 
-	float zoomSpeed = 0.05;
+	float zoomSpeed = 0.075;
+	Texture2D screenBuffer;
+
+	void ZoomHandler(FractalRenderer& fractalRenderer);
 
 };

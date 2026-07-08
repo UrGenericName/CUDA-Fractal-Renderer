@@ -28,6 +28,9 @@
     <ClCompile Include="rllmGui\rlImGui.cpp">
       <Filter>rllmGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\DebugWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="rllmGui\rlImGuiColors.h">
       <Filter>rllmGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DebugWindow.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,31 +3,22 @@
 
 #include "Window.h"
 #include "raylib.h"
-#include "imgui.h"
-#include "rlImGui.h"
+#include "DebugWindow.h"
 #include "FractalRenderer.h"
 
 void main() {
 
 	Window window { "Window", 960, 540 };
-	FractalRenderer fractalRenderer{ window.width, window.height };
+	DebugWindow debugWindow;
 
-	std::vector<Color> buffer{ static_cast<unsigned int>(window.width * window.height) };
+	FractalRenderer fractalRenderer{ window.width, window.height };
 
 	while (!WindowShouldClose()) {
 
 		BeginDrawing();
-		fractalRenderer.generate(buffer);
-		window.Draw(buffer);
-		window.ZoomHandler(fractalRenderer);
-
-		rlImGuiBegin();
-
-		ImGui::Begin("Hello rlImGui");
-		ImGui::Text("This works perfectly with Raylib!");
-		ImGui::End();
-
-		rlImGuiEnd();
+		fractalRenderer.generate();
+		window.Draw(fractalRenderer);
+		debugWindow.Draw(fractalRenderer);
 		EndDrawing();
 	}
 
