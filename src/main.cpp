@@ -15,14 +15,13 @@ void main() {
 
 	while (!WindowShouldClose()) {
 
-		BeginDrawing();
 		fractalRenderer.generate();
+
+		BeginDrawing();
 		window.Draw(fractalRenderer);
 		debugWindow.Draw(fractalRenderer);
 		EndDrawing();
 	}
-
-	rlImGuiShutdown();
 
 	return;
 

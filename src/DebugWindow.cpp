@@ -8,24 +8,28 @@ DebugWindow::DebugWindow() {
 	rlImGuiSetup(true); 
 }
 
-DebugWindow::~DebugWindow() { rlImGuiShutdown(); }
+DebugWindow::~DebugWindow() { 
+	rlImGuiShutdown(); 
+}
 
 void DebugWindow::Draw(FractalRenderer& fractalRenderer) {
 
 	if (IsKeyPressed(KEY_F)) drawWindow = !drawWindow;
 
-	if (!drawWindow) return;
-
 	rlImGuiBegin();
 
-	if (BeginTable("Settings", 1)) {
+	if (drawWindow) {
 
-		TableSetupColumn("Settings");
-		TableHeadersRow();
+		if (BeginTable("Settings", 1)) {
 
-		SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
+			TableSetupColumn("Settings");
+			TableHeadersRow();
 
-		EndTable();
+			SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
+
+			EndTable();
+		}
+
 	}
 
 	rlImGuiEnd();
