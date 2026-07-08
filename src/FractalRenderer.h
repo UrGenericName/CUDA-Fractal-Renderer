@@ -1,16 +1,13 @@
 #pragma once
 #include <vector>
-#include "Color.h"
+#include "raylib.h"
 
 class FractalRenderer {
 public:
-
-	double x_max = 1.0f;
-	double x_min = -1.5f;
-
-	double y_max = 1.0f;
-	double y_min = -1.0f;
 	
+	Vector2 pos{ 0.0f, 0.0f };
+	float scale = 1.0f;
+
 	FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {};
 	void generate(std::vector<Color>& buffer);
 
@@ -18,5 +15,5 @@ private:
 	int width;
 	int height;
 
-	int MAX_ITERATIONS = 50;
+	int MAX_ITERATIONS = 100;
 };

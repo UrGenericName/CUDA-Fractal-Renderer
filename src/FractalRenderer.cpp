@@ -9,8 +9,14 @@ void FractalRenderer::generate(std::vector<Color>& buffer) {
             float x_normalized = (static_cast<float>(x) / static_cast<float>(width));
             float y_normalized = (static_cast<float>(y) / static_cast<float>(height));
 
-            float cx = (x_normalized * (x_max - x_min)) + x_min;
-            float cy = (y_normalized * (y_max - y_min)) + y_min;
+            if (width > height) {
+                x_normalized *= (static_cast<float>(width) / height);
+            } else {
+                y_normalized *= (static_cast<float>(height) / width);
+            }
+
+            float cx = (x_normalized - 0.5f) * scale + 0.5f + pos.x;
+            float cy = (y_normalized - 0.5f) * scale + 0.5f + pos.y;
 
             float zx = 0.0f;
             float zy = 0.0f;
@@ -24,10 +30,8 @@ void FractalRenderer::generate(std::vector<Color>& buffer) {
                 iteration++;
             }
 
-
-
-            Color color = { 0, 0, 0 };
-            if (iteration <= MAX_ITERATIONS) color = { static_cast<unsigned char>(255 * ((float)iteration / (float)MAX_ITERATIONS)), 0, 0};
+            Color color = { 0, 0, 0, 255 };
+            if (iteration <= MAX_ITERATIONS) color = { 0, static_cast<unsigned char>(255 * ((float)iteration / (float)MAX_ITERATIONS)), static_cast<unsigned char>(255 * ((float)iteration / (float)MAX_ITERATIONS)), 255};
 
             buffer[y * width + x] = color;
 

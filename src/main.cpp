@@ -2,35 +2,24 @@
 #include <iostream>
 
 #include "Window.h"
+#include "raylib.h"
 #include "FractalRenderer.h"
 
 void main() {
 	
-	Window* window = new Window{ L"Window", 960, 540 };
-	FractalRenderer fractalRenderer{ window->width, window->height };
+	Window window { "Window", 960, 540 };
+	FractalRenderer fractalRenderer{ window.width, window.height };
 
-	std::vector<Color> buffer{ static_cast<unsigned int>(window->width * window->height) };
-	fractalRenderer.generate(buffer);
-	window->Draw(buffer);
+	std::vector<Color> buffer{ static_cast<unsigned int>(window.width * window.height) };
 
-	bool running = true;
-	while (running) {
+	while (!WindowShouldClose()) {
 
+		BeginDrawing();
 		fractalRenderer.generate(buffer);
-		window->Draw(buffer);
-
-		window->ZoomDragHandler(fractalRenderer);
-
-		if (!window->ProcessMessages()) {
-			running = false;
-			std::cout << "Closing Window" << std::endl;
-		}
-
-		Sleep(10);
-
+		window.Draw(buffer);
+		window.ZoomHandler(fractalRenderer);
+		EndDrawing();
 	}
-
-	delete window;
 
 	return;
 
