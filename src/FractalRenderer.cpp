@@ -11,7 +11,22 @@ FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), he
 }
 
 void FractalRenderer::generate(vector<Color>& buffer) {
-    generateMultiThreadedCPU(buffer);
+
+    switch (renderMethod) {
+
+    case RenderMethod::CPU:
+        generateCPU(buffer);
+        break;
+
+    case RenderMethod::CPU_MULTI_THREADED:
+        generateMultiThreadedCPU(buffer);
+        break;
+
+    case RenderMethod::GPU:
+        generateGPU(buffer);
+        break;
+
+    }
 }
 
 void FractalRenderer::generate() {
@@ -50,6 +65,8 @@ void FractalRenderer::generateMultiThreadedCPU(vector<Color>& buffer) {
     }
 
 }
+
+void FractalRenderer::generateGPU(vector<Color>& buffer) {}
 
 void FractalRenderer::calculatePixelGroup(vector<Color>& buffer, unsigned int offset, unsigned int pixelCount) {
 
