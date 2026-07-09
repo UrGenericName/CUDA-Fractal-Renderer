@@ -2,6 +2,7 @@
 #include "DebugWindow.h"
 
 #include "string"
+#include <typeinfo>
 
 using namespace ImGui;
 using namespace std;
@@ -39,6 +40,11 @@ void DebugWindow::DrawViewportInfo(FractalRenderer& fractalRenderer) {
 		TableHeadersRow();
 
 
+		TableNextColumn();
+		string precisionText = string{ "Precision: " } + typeid(Real).name();
+		Text(precisionText.c_str());
+		TableNextRow();
+
 		float total_width = GetContentRegionAvail().x;
 		float item_width = (total_width - GetStyle().ItemSpacing.x) / 5.0f;
 
@@ -47,10 +53,10 @@ void DebugWindow::DrawViewportInfo(FractalRenderer& fractalRenderer) {
 		Text("(x, y): ");
 		SameLine();
 		SetNextItemWidth(item_width);
-		Text(to_string(fractalRenderer.pos.x).c_str());
+		Text(to_string(fractalRenderer.posX).c_str());
 		SameLine();
 		SetNextItemWidth(item_width);
-		Text(to_string(fractalRenderer.pos.y).c_str());
+		Text(to_string(fractalRenderer.posY).c_str());
 
 		TableNextRow();
 
@@ -146,14 +152,19 @@ void DebugWindow::DrawFractalSettings(FractalRenderer& fractalRenderer) {
 			float total_width = GetContentRegionAvail().x;
 			float item_width = (total_width - GetStyle().ItemSpacing.x) / 5.0f;
 
+			double inputJuliaX, inputJuliaY;
+
 			SetNextItemWidth(item_width);
 			Text("(x, y): ");
 			SameLine();
 			SetNextItemWidth(item_width);
-			InputFloat("##juliaX", &(fractalRenderer.juliaC.x));
+			InputDouble("##juliaX", &(inputJuliaX));
 			SameLine();
 			SetNextItemWidth(item_width);
-			InputFloat("##juliaY", &(fractalRenderer.juliaC.y));
+			InputDouble("##juliaY", &(inputJuliaY));
+
+			fractalRenderer.juliaCx = inputJuliaX;
+			fractalRenderer.juliaCy = inputJuliaY;
 
 		}
 

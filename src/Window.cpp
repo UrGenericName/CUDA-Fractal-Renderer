@@ -46,13 +46,14 @@ void Window::JuliaHandler(FractalRenderer& fractalRenderer) {
 void Window::SetJuliaCursor(FractalRenderer& fractalRenderer) {
 
 	Vector2 mousePos = GetMousePosition();
-	fractalRenderer.juliaC = fractalRenderer.screenCoordToGlobal(mousePos.x, mousePos.y);
+	fractalRenderer.screenCoordToGlobal(mousePos.x, mousePos.y, &fractalRenderer.juliaCx, &fractalRenderer.juliaCy);
 
 }
 
 void Window::DrawJuliaCursor(FractalRenderer& fractalRenderer) {
 
-	Vector2 screenCoord = fractalRenderer.globalCoordToScreen(fractalRenderer.juliaC.x, fractalRenderer.juliaC.y);
+	Real screenX, screenY;
+	fractalRenderer.globalCoordToScreen(fractalRenderer.juliaCx, fractalRenderer.juliaCy, &screenX, &screenY);
 
 	const int length = 11;
 	const int thickness = 1;
@@ -60,14 +61,14 @@ void Window::DrawJuliaCursor(FractalRenderer& fractalRenderer) {
 	Rectangle verticalBar;
 	verticalBar.width = thickness;
 	verticalBar.height = length;
-	verticalBar.x = screenCoord.x - (thickness / 2);
-	verticalBar.y = screenCoord.y - (length / 2);
+	verticalBar.x = screenX - (thickness / 2);
+	verticalBar.y = screenY - (length / 2);
 
 	Rectangle horizontalBar;
 	horizontalBar.width = length;
 	horizontalBar.height = thickness;
-	horizontalBar.x = screenCoord.x - (length / 2);
-	horizontalBar.y = screenCoord.y - (thickness / 2);
+	horizontalBar.x = screenX - (length / 2);
+	horizontalBar.y = screenY - (thickness / 2);
 
 	DrawRectangleRec(verticalBar, WHITE);
 	DrawRectangleRec(horizontalBar, WHITE);
@@ -84,18 +85,19 @@ void Window::ZoomHandler(FractalRenderer& fractalRenderer) {
 	{
 
 		static Vector2 initalCursorPos;
-		static Vector2 origFratcalPos;
+		static Real origFractalPosX, origFractalPosY;
 		if (firstClick) {
 			initalCursorPos = GetMousePosition();
-			origFratcalPos = fractalRenderer.pos;
+			origFractalPosX = fractalRenderer.posX;
+			origFractalPosY = fractalRenderer.posY;
 			firstClick = false;
 		}
 
 		Vector2 currentCursorPos = GetMousePosition();
 
 		Vector2 cursor_diff_normalized = { (initalCursorPos.x - currentCursorPos.x) / width, (initalCursorPos.y - currentCursorPos.y) / height };
-		fractalRenderer.pos.x = origFratcalPos.x + (cursor_diff_normalized.x * fractalRenderer.scale);
-		fractalRenderer.pos.y = origFratcalPos.y + (cursor_diff_normalized.y * fractalRenderer.scale);
+		fractalRenderer.posX = origFractalPosX + (cursor_diff_normalized.x * fractalRenderer.scale);
+		fractalRenderer.posY = origFractalPosY + (cursor_diff_normalized.y * fractalRenderer.scale);
 
 	} 
 	else 

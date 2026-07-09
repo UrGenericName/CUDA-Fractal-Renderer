@@ -86,9 +86,10 @@ void FractalRenderer::renderMandelbrotSet(char* buffer, unsigned int offset, uns
 
         size_t pixelStartIndex = 3 * (y * width + x);
 
-        Vector2 globalCoords = screenCoordToGlobal(x, y);
-        int iteration = mandelbrotSetMath(globalCoords.x, globalCoords.y);
-        Color color = calculateColor(iteration);
+        Real globalX, globalY;
+        screenCoordToGlobal(x, y, &globalX, &globalY);
+        int iteration = mandelbrotSetMath(maxIterations, globalX, globalY);
+        Color color = calculateColor(maxIterations, iteration);
 
 
         buffer[pixelStartIndex + 0] = color.r;
@@ -106,9 +107,10 @@ void FractalRenderer::renderJuliaSet(char* buffer, unsigned int offset, unsigned
         int y = i / width;
         size_t pixelStartIndex = 3 * (y * width + x);
 
-        Vector2 globalCoords = screenCoordToGlobal(x, y);
-        int iteration = juliaSetMath(globalCoords.x, globalCoords.y);
-        Color color = calculateColor(iteration);
+        Real globalX, globalY;
+        screenCoordToGlobal(x, y, &globalX, &globalY);
+        int iteration = juliaSetMath(maxIterations, globalX, globalY, juliaCx, juliaCy);
+        Color color = calculateColor(maxIterations, iteration);
 
 
         buffer[pixelStartIndex + 0] = color.r;
@@ -118,67 +120,72 @@ void FractalRenderer::renderJuliaSet(char* buffer, unsigned int offset, unsigned
 
 }
 
-Vector2 FractalRenderer::screenCoordToGlobal(float x, float y) {
+void FractalRenderer::screenCoordToGlobal(Real x, Real y, Real* x_global, Real* y_global) {
 
-    float x_normalized = (static_cast<float>(x) / static_cast<float>(width));
-    float y_normalized = (static_cast<float>(y) / static_cast<float>(height));
+    Real x_normalized = (static_cast<Real>(x) / static_cast<Real>(width));
+    Real y_normalized = (static_cast<Real>(y) / static_cast<Real>(height));
 
     // Slightly increases the size of either x or y to account for non-square aspect ratio
     if (width > height) {
-        float ratio = (static_cast<float>(width) / height);
+        Real ratio = (static_cast<Real>(width) / height);
         x_normalized *= ratio;
         x_normalized -= (ratio - 1.0f) / 2.0f;
     }
     else {
-        float ratio = (static_cast<float>(height) / width);
+        Real ratio = (static_cast<Real>(height) / width);
         y_normalized *= ratio;
         y_normalized -= (ratio - 1.0f) / 2.0f;
     }
 
-    float x_global = (x_normalized - 0.5f) * scale + 0.5f + pos.x;
-    float y_global = (y_normalized - 0.5f) * scale + 0.5f + pos.y;
-
-    return Vector2{ x_global, y_global };
+    *x_global = (x_normalized - 0.5f) * scale + 0.5f + posX;
+    *y_global = (y_normalized - 0.5f) * scale + 0.5f + posY;
 
 }
 
-Vector2 FractalRenderer::globalCoordToScreen(float x, float y) {
+void FractalRenderer::globalCoordToScreen(Real x, Real y, Real* x_screen, Real* y_screen) {
 
     // Reverse the position offset and scale scaling
-    float x_normalized = (x - pos.x - 0.5f) / scale + 0.5f;
-    float y_normalized = (y - pos.y - 0.5f) / scale + 0.5f;
+    Real x_normalized = (x - posX - 0.5f) / scale + 0.5f;
+    Real y_normalized = (y - posY - 0.5f) / scale + 0.5f;
 
     // Reverse the aspect ratio centering adjustments
     if (width > height) {
-        float ratio = (static_cast<float>(width) / height);
+        Real ratio = (static_cast<Real>(width) / height);
         x_normalized += (ratio - 1.0f) / 2.0f;
         x_normalized /= ratio;
     }
     else {
-        float ratio = (static_cast<float>(height) / width);
+        Real ratio = (static_cast<Real>(height) / width);
         y_normalized += (ratio - 1.0f) / 2.0f;
         y_normalized /= ratio;
     }
 
     // Reverse the normalization to map back to pixel dimensions
-    float x_screen = x_normalized * static_cast<float>(width);
-    float y_screen = y_normalized * static_cast<float>(height);
-
-    return Vector2{ x_screen, y_screen };
+    *x_screen = x_normalized * static_cast<Real>(width);
+    *y_screen = y_normalized * static_cast<Real>(height);
 
 }
 
-inline int FractalRenderer::mandelbrotSetMath(float x, float y) {
+inline int FractalRenderer::mandelbrotSetMath(int maxIterations, Real x, Real y) {
 
-    complex<float> z{ 0.0f, 0.0f };
-    complex<float> c{ x, y };
+    Real zx = 0.0f;
+    Real zy = 0.0f;
+
+    Real cx = x;
+    Real cy = y;
 
     int iteration = 0;
     while (iteration <= maxIterations) {
 
-        z = (z * z) + c;
+        Real zx2 = (zx * zx) - (zy * zy);
+        Real zy2 = 2 * zx * zy;
 
-        if (real(z) * real(z) + imag(z) * imag(z) > 4) break;
+        zx = zx2 + cx;
+        zy = zy2 + cy;
+
+        Real distanceFromOriginSquared = (zx * zx) + (zy * zy);
+
+        if (distanceFromOriginSquared > 4) break;
         iteration++;
     }
 
@@ -186,25 +193,35 @@ inline int FractalRenderer::mandelbrotSetMath(float x, float y) {
 
 }
 
-inline int FractalRenderer::juliaSetMath(float x, float y) {
+inline int FractalRenderer::juliaSetMath(int maxIterations, Real x, Real y, Real juliaCx, Real juliaCy) {
 
-    complex<float> z{ x, y };
-    complex<float> c{ juliaC.x, juliaC.y };
+    Real zx = x;
+    Real zy = y;
+
+    Real cx = juliaCx;
+    Real cy = juliaCy;
 
     int iteration = 0;
     while (iteration <= maxIterations) {
 
-        z = (z * z) + c;
+        Real zx2 = (zx * zx) - (zy * zy);
+        Real zy2 = 2 * zx * zy;
 
-        if (real(z) * real(z) + imag(z) * imag(z) > 4) break;
+        zx = zx2 + cx;
+        zy = zy2 + cy;
+
+        Real distanceFromOriginSquared = (zx * zx) + (zy * zy);
+
+        if (distanceFromOriginSquared > 4) break;
         iteration++;
     }
 
     return iteration;
 
+
 }
 
-inline Color FractalRenderer::calculateColor(int iteration) {
+inline Color FractalRenderer::calculateColor(int maxIterations, int iteration) {
 
     Color color = { 0, 0, 0, 255 };
     if (iteration <= maxIterations) {

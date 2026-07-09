@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
-#include <complex>
 #include "raylib.h"
+
+using Real = long double;
 
 class Window;
 
 class FractalRenderer {
 public:
-	
+
 	friend Window;
 
 	enum class FractalType {
@@ -25,9 +26,12 @@ public:
 	FractalType fractalType = FractalType::MANDELBROT;
 	RenderMethod renderMethod = RenderMethod::CPU_MULTI_THREADED;
 
-	Vector2 juliaC{ 0.0f, 0.0f };
+	Real juliaCx = 0.0f;
+	Real juliaCy = 0.0f;
 
-	Vector2 pos{ 0.0f, 0.0f };
+	Real posX = 0.0f;
+	Real posY = 0.0f;
+
 	float scale = 1.0f;
 
 	FractalRenderer(int i_width, int i_height); // implementation in .cu
@@ -46,12 +50,12 @@ private:
 	void renderMandelbrotSet(char* buffer, unsigned int offset, unsigned int pixelCount);
 	void renderJuliaSet(char* buffer, unsigned int offset, unsigned int pixelCount);
 
-	Vector2 screenCoordToGlobal(float x, float y);
-	Vector2 globalCoordToScreen(float x, float y);
+	void screenCoordToGlobal(Real x, Real y, Real* x_global, Real* y_global);
+	void globalCoordToScreen(Real x, Real y, Real* x_screen, Real* y_screen);
 
-	inline int mandelbrotSetMath(float x, float y);
-	inline int juliaSetMath(float x, float y);
-	inline Color calculateColor(int iteration);
+	inline int mandelbrotSetMath(int maxIterations, Real x, Real y);
+	inline int juliaSetMath(int maxIterations, Real x, Real y, Real juliaCx, Real juliaCy);
+	inline Color calculateColor(int maxIterations, int iteration);
 
 	char* buffer;	// R8G8B8 for each pixel
 };
