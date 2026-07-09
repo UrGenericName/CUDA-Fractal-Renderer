@@ -14,7 +14,7 @@ public:
 	const int width;
 	const int height;
 
-	Window(const char* title, int i_width, int i_height);
+	Window(std::string title, int i_width, int i_height);
 	~Window();
 
 	void Draw(FractalRenderer& fractalRenderer);
@@ -25,5 +25,7 @@ private:
 	Texture2D screenBuffer;
 
 	void ZoomHandler(FractalRenderer& fractalRenderer);
+	std::string generateFullTitle();
 
+	std::string title;
 };

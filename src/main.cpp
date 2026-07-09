@@ -8,10 +8,10 @@
 
 void main() {
 
-	Window window { "Window", 960, 540 };
+	Window window { "Fractal Renderer", 960, 540 };
 	DebugWindow debugWindow;
 
-	FractalRenderer fractalRenderer{ window.width, window.height };
+	FractalRenderer fractalRenderer{ window.width, window.height};
 
 	while (!WindowShouldClose()) {
 

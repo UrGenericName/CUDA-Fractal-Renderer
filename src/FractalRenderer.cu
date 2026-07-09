@@ -1,6 +1,8 @@
 #pragma once
 #include "FractalRenderer.h"
 
+#include <cuda_runtime.h>
+
 void renderMandelbrotSetCUDA(char* buffer, int width, int height, float scale, float posX, float posY) {
 
     for (int i = 0; i < width * height; ++i) {

@@ -6,10 +6,9 @@
 
 using namespace std;
 
-Window::Window(const char* title, int i_width, int i_height) : width(i_width), height(i_height) {
+Window::Window(string i_title, int i_width, int i_height) : title(i_title), width(i_width), height(i_height) {
 	
-	InitWindow(width, height, title);
-	SetTargetFPS(60);
+	InitWindow(width, height, generateFullTitle().c_str());
 
 	Image dummyImage = { nullptr, width, height, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8 };
 	screenBuffer = LoadTextureFromImage(dummyImage);
@@ -29,6 +28,8 @@ void Window::Draw(FractalRenderer& fractalRenderer) {
 	DrawTexture(screenBuffer, 0, 0, WHITE);
 
 	ZoomHandler(fractalRenderer);
+
+	SetWindowTitle(generateFullTitle().c_str());
 
 }
 
@@ -64,4 +65,8 @@ void Window::ZoomHandler(FractalRenderer& fractalRenderer) {
 	// SCALING
 	fractalRenderer.scale -= (GetMouseWheelMove() * zoomSpeed * fractalRenderer.scale);
 
+}
+
+string Window::generateFullTitle() {
+	return title + "     FPS: " + to_string(GetFPS());
 }
