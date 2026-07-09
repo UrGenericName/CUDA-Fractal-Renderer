@@ -25,6 +25,9 @@ private:
 	Texture2D screenBuffer;
 
 	void ZoomHandler(FractalRenderer& fractalRenderer);
+	void JuliaHandler(FractalRenderer& fractalRenderer);
+	void SetJuliaCursor(FractalRenderer& fractalRenderer);
+	void DrawJuliaCursor(FractalRenderer& fractalRenderer);
 	std::string generateFullTitle();
 
 	std::string title;

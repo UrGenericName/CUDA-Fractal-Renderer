@@ -122,7 +122,7 @@ void FractalRenderer::renderJuliaSet(char* buffer, unsigned int offset, unsigned
 
 }
 
-inline Vector2 FractalRenderer::screenCoordToGlobal(float x, float y) {
+Vector2 FractalRenderer::screenCoordToGlobal(float x, float y) {
 
     float x_normalized = (static_cast<float>(x) / static_cast<float>(width));
     float y_normalized = (static_cast<float>(y) / static_cast<float>(height));
@@ -143,6 +143,32 @@ inline Vector2 FractalRenderer::screenCoordToGlobal(float x, float y) {
     float y_global = (y_normalized - 0.5f) * scale + 0.5f + pos.y;
 
     return Vector2{ x_global, y_global };
+
+}
+
+Vector2 FractalRenderer::globalCoordToScreen(float x, float y) {
+
+    // Reverse the position offset and scale scaling
+    float x_normalized = (x - pos.x - 0.5f) / scale + 0.5f;
+    float y_normalized = (y - pos.y - 0.5f) / scale + 0.5f;
+
+    // Reverse the aspect ratio centering adjustments
+    if (width > height) {
+        float ratio = (static_cast<float>(width) / height);
+        x_normalized += (ratio - 1.0f) / 2.0f;
+        x_normalized /= ratio;
+    }
+    else {
+        float ratio = (static_cast<float>(height) / width);
+        y_normalized += (ratio - 1.0f) / 2.0f;
+        y_normalized /= ratio;
+    }
+
+    // Reverse the normalization to map back to pixel dimensions
+    float x_screen = x_normalized * static_cast<float>(width);
+    float y_screen = y_normalized * static_cast<float>(height);
+
+    return Vector2{ x_screen, y_screen };
 
 }
 

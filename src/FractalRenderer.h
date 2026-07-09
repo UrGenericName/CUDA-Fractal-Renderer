@@ -46,7 +46,9 @@ private:
 	void renderMandelbrotSet(char* buffer, unsigned int offset, unsigned int pixelCount);
 	void renderJuliaSet(char* buffer, unsigned int offset, unsigned int pixelCount);
 
-	inline Vector2 screenCoordToGlobal(float x, float y);
+	Vector2 screenCoordToGlobal(float x, float y);
+	Vector2 globalCoordToScreen(float x, float y);
+
 	inline int mandelbrotSetMath(float x, float y);
 	inline int juliaSetMath(float x, float y);
 	inline Color calculateColor(int iteration);

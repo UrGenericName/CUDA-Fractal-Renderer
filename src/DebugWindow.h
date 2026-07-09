@@ -14,6 +14,10 @@ public:
 	void Draw(FractalRenderer& fractalRenderer);
 
 private:
+	void DrawViewportInfo(FractalRenderer& fractalRenderer);
+	void DrawRenderSettings(FractalRenderer& fractalRenderer);
+	void DrawFractalSettings(FractalRenderer& fractalRenderer);
+
 	bool drawWindow = true;
 
 };

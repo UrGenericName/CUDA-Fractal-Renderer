@@ -27,9 +27,50 @@ void Window::Draw(FractalRenderer& fractalRenderer) {
 	UpdateTexture(screenBuffer, fractalRenderer.buffer);
 	DrawTexture(screenBuffer, 0, 0, WHITE);
 
+	JuliaHandler(fractalRenderer);
 	ZoomHandler(fractalRenderer);
 
 	SetWindowTitle(generateFullTitle().c_str());
+
+}
+
+void Window::JuliaHandler(FractalRenderer& fractalRenderer) {
+
+	if (fractalRenderer.fractalType == FractalRenderer::FractalType::JULIA) {
+		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) SetJuliaCursor(fractalRenderer);
+		DrawJuliaCursor(fractalRenderer);
+	}
+
+}
+
+void Window::SetJuliaCursor(FractalRenderer& fractalRenderer) {
+
+	Vector2 mousePos = GetMousePosition();
+	fractalRenderer.juliaC = fractalRenderer.screenCoordToGlobal(mousePos.x, mousePos.y);
+
+}
+
+void Window::DrawJuliaCursor(FractalRenderer& fractalRenderer) {
+
+	Vector2 screenCoord = fractalRenderer.globalCoordToScreen(fractalRenderer.juliaC.x, fractalRenderer.juliaC.y);
+
+	const int length = 11;
+	const int thickness = 1;
+
+	Rectangle verticalBar;
+	verticalBar.width = thickness;
+	verticalBar.height = length;
+	verticalBar.x = screenCoord.x - (thickness / 2);
+	verticalBar.y = screenCoord.y - (length / 2);
+
+	Rectangle horizontalBar;
+	horizontalBar.width = length;
+	horizontalBar.height = thickness;
+	horizontalBar.x = screenCoord.x - (length / 2);
+	horizontalBar.y = screenCoord.y - (thickness / 2);
+
+	DrawRectangleRec(verticalBar, WHITE);
+	DrawRectangleRec(horizontalBar, WHITE);
 
 }
 

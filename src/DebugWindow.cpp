@@ -1,7 +1,10 @@
 #pragma once
 #include "DebugWindow.h"
 
+#include "string"
+
 using namespace ImGui;
+using namespace std;
 
 DebugWindow::DebugWindow() { 
 	assert(IsWindowReady()); // ensures raylib window is initalized first
@@ -19,66 +22,142 @@ void DebugWindow::Draw(FractalRenderer& fractalRenderer) {
 	rlImGuiBegin();
 
 	if (drawWindow) {
-
-		if (BeginTable("Settings", 1)) {
-
-			TableSetupColumn("Settings");
-			TableHeadersRow();
-
-			SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
-
-			const char* items[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
-			static int current_item_id = 0;
-
-			if (BeginCombo("Render Method", items[current_item_id])) {
-
-				for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
-					const bool is_selected = (current_item_id == n);
-
-					if (ImGui::Selectable(items[n], is_selected)) {
-						current_item_id = n;
-					}
-
-					if (is_selected) {
-						ImGui::SetItemDefaultFocus();
-					}
-				}
-
-				fractalRenderer.renderMethod = static_cast<FractalRenderer::RenderMethod>(current_item_id);
-
-				ImGui::EndCombo();
-			}
-
-			const char* types[] = { "Mandelbrot Set", "Julia Set" };
-			static int current_type_id = 0;
-
-			if (BeginCombo("Fractal Type", types[current_type_id])) {
-
-				for (int n = 0; n < IM_ARRAYSIZE(types); n++) {
-					const bool is_selected = (current_type_id == n);
-
-					if (ImGui::Selectable(types[n], is_selected)) {
-						current_type_id = n;
-					}
-
-					if (is_selected) {
-						ImGui::SetItemDefaultFocus();
-					}
-				}
-
-				fractalRenderer.fractalType = static_cast<FractalRenderer::FractalType>(current_type_id);
-
-				ImGui::EndCombo();
-			}
-
-			SliderFloat("x", &(fractalRenderer.juliaC.x), -5.0f, 5.0f);
-			SliderFloat("y", &(fractalRenderer.juliaC.y), -5.0f, 5.0f);
-
-			EndTable();
-		}
-
+		DrawViewportInfo(fractalRenderer);
+		DrawRenderSettings(fractalRenderer);
+		DrawFractalSettings(fractalRenderer);
 	}
 
 	rlImGuiEnd();
+
+}
+
+void DebugWindow::DrawViewportInfo(FractalRenderer& fractalRenderer) {
+
+	if (BeginTable("##ViewportInfoTable", 1)) {
+
+		TableSetupColumn("Viewport");
+		TableHeadersRow();
+
+
+		float total_width = GetContentRegionAvail().x;
+		float item_width = (total_width - GetStyle().ItemSpacing.x) / 5.0f;
+
+		TableNextColumn();
+		SetNextItemWidth(item_width);
+		Text("(x, y): ");
+		SameLine();
+		SetNextItemWidth(item_width);
+		Text(to_string(fractalRenderer.pos.x).c_str());
+		SameLine();
+		SetNextItemWidth(item_width);
+		Text(to_string(fractalRenderer.pos.y).c_str());
+
+		TableNextRow();
+
+		TableNextColumn();
+		SetNextItemWidth(item_width);
+		Text("Scale: ");
+		SameLine();
+		SetNextItemWidth(item_width);
+		Text(to_string(fractalRenderer.scale).c_str());
+
+		EndTable();
+
+	}
+
+	Spacing();
+
+}
+
+void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
+
+	if (BeginTable("##RenderSettingsTable", 1)) {
+
+		TableSetupColumn("Render Settings");
+		TableHeadersRow();
+
+		TableNextColumn();
+
+		SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
+
+		const char* items[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
+		static int current_item_id = 0;
+
+		if (BeginCombo("Render Method", items[current_item_id])) {
+
+			for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+				const bool is_selected = (current_item_id == n);
+
+				if (ImGui::Selectable(items[n], is_selected)) {
+					current_item_id = n;
+				}
+
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+
+			fractalRenderer.renderMethod = static_cast<FractalRenderer::RenderMethod>(current_item_id);
+
+			ImGui::EndCombo();
+		}
+
+		EndTable();
+
+	}
+
+	Spacing();
+
+}
+
+void DebugWindow::DrawFractalSettings(FractalRenderer& fractalRenderer) {
+
+	if (BeginTable("##FractalSettingsTable", 1)) {
+
+		TableSetupColumn("Fractal Settings");
+		TableHeadersRow();
+
+		TableNextColumn();
+
+		const char* types[] = { "Mandelbrot Set", "Julia Set" };
+		static int current_type_id = 0;
+
+		if (BeginCombo("Fractal Type", types[current_type_id])) {
+
+			for (int n = 0; n < IM_ARRAYSIZE(types); n++) {
+				const bool is_selected = (current_type_id == n);
+
+				if (ImGui::Selectable(types[n], is_selected)) {
+					current_type_id = n;
+				}
+
+				if (is_selected) {
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+
+			fractalRenderer.fractalType = static_cast<FractalRenderer::FractalType>(current_type_id);
+
+			ImGui::EndCombo();
+		}
+
+		if (fractalRenderer.fractalType == FractalRenderer::FractalType::JULIA) {
+
+			float total_width = GetContentRegionAvail().x;
+			float item_width = (total_width - GetStyle().ItemSpacing.x) / 5.0f;
+
+			SetNextItemWidth(item_width);
+			Text("(x, y): ");
+			SameLine();
+			SetNextItemWidth(item_width);
+			InputFloat("##juliaX", &(fractalRenderer.juliaC.x));
+			SameLine();
+			SetNextItemWidth(item_width);
+			InputFloat("##juliaY", &(fractalRenderer.juliaC.y));
+
+		}
+
+		EndTable();
+	}
 
 }
