@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "raylib.h"
 
 using Real = long double;
@@ -37,6 +38,8 @@ public:
 	FractalRenderer(int i_width, int i_height); // implementation in .cu
 	void generate(char* buffer);
 	void generate();
+
+	void renderImage();
 
 private:
 	const int width;

@@ -108,6 +108,8 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 			ImGui::EndCombo();
 		}
 
+		if (Button("Render Image")) fractalRenderer.renderImage();
+
 		EndTable();
 
 	}

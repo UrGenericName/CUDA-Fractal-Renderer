@@ -1,8 +1,14 @@
 #pragma once
 #include "FractalRenderer.h"
 
+#include <filesystem>
+#include <chrono>
 #include <thread>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+namespace fs = std::filesystem;
 using namespace std;
 
 void FractalRenderer::generate(char* buffer) {
@@ -237,5 +243,22 @@ inline Color FractalRenderer::calculateColor(int maxIterations, int iteration) {
     }
 
     return color;
+
+}
+
+void FractalRenderer::renderImage() {
+
+    auto now = chrono::system_clock::now();
+    auto local_time = chrono::current_zone()->to_local(now);
+    string timeStamp = format("{:%Y-%m-%d_%H-%M-%S}", local_time);
+    string fileName = "output_" + timeStamp + ".png";
+
+    fs::create_directories("output");
+    fs::path destination = string("output/" + fileName);
+    string destinationStr = destination.string();
+    const char* destinationCstr = destinationStr.c_str();
+
+    stbi_flip_vertically_on_write(true);
+    stbi_write_png(destinationCstr, width, height, 3, buffer, width * 3);
 
 }
