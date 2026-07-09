@@ -86,15 +86,15 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 
 		SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
 
-		const char* items[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
+		const char* methods[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
 		static int current_item_id = 0;
 
-		if (BeginCombo("Method", items[current_item_id])) {
+		if (BeginCombo("Method", methods[current_item_id])) {
 
-			for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+			for (int n = 0; n < IM_ARRAYSIZE(methods); n++) {
 				const bool is_selected = (current_item_id == n);
 
-				if (ImGui::Selectable(items[n], is_selected)) {
+				if (ImGui::Selectable(methods[n], is_selected)) {
 					current_item_id = n;
 				}
 
@@ -109,7 +109,7 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 		}
 		
 		if (Button("Benchmark")) fractalRenderer.benchmark();
-
+		SameLine();
 		if (Button("Render Image")) fractalRenderer.renderImage();
 
 		EndTable();
@@ -132,7 +132,7 @@ void DebugWindow::DrawFractalSettings(FractalRenderer& fractalRenderer) {
 		const char* types[] = { "Mandelbrot Set", "Julia Set" };
 		static int current_type_id = 0;
 
-		if (BeginCombo("Fractal Type", types[current_type_id])) {
+		if (BeginCombo("Type", types[current_type_id])) {
 
 			for (int n = 0; n < IM_ARRAYSIZE(types); n++) {
 				const bool is_selected = (current_type_id == n);
@@ -156,7 +156,8 @@ void DebugWindow::DrawFractalSettings(FractalRenderer& fractalRenderer) {
 			float total_width = GetContentRegionAvail().x;
 			float item_width = (total_width - GetStyle().ItemSpacing.x) / 5.0f;
 
-			double inputJuliaX, inputJuliaY;
+			double inputJuliaX = fractalRenderer.juliaCx;
+			double inputJuliaY = fractalRenderer.juliaCy;
 
 			SetNextItemWidth(item_width);
 			Text("(x, y): ");

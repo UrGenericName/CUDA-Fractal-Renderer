@@ -9,6 +9,7 @@ using namespace std;
 Window::Window(string i_title, int i_width, int i_height) : title(i_title), width(i_width), height(i_height) {
 	
 	InitWindow(width, height, generateFullTitle().c_str());
+	SetTargetFPS(9999);
 
 	Image dummyImage = { nullptr, width, height, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8 };
 	screenBuffer = LoadTextureFromImage(dummyImage);
