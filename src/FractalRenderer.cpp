@@ -1,16 +1,15 @@
 #pragma once
 #include "FractalRenderer.h"
 
-#include <complex>
 #include <thread>
 
 using namespace std;
 
 FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {
-    buffer.resize(width * height);
+    buffer = new char[3 * width * height]{0};
 }
 
-void FractalRenderer::generate(vector<Color>& buffer) {
+void FractalRenderer::generate(char* buffer) {
 
     switch (renderMethod) {
 
@@ -33,13 +32,13 @@ void FractalRenderer::generate() {
     generate(this->buffer);
 }
 
-void FractalRenderer::generateCPU(vector<Color>& buffer) {
+void FractalRenderer::generateCPU(char* buffer) {
 
-    calculatePixelGroup(buffer, 0, width * height);
+    renderPixels(buffer, 0, width * height);
 
 }
 
-void FractalRenderer::generateMultiThreadedCPU(vector<Color>& buffer) {
+void FractalRenderer::generateMultiThreadedCPU(char* buffer) {
 
     vector<thread> threads;
     unsigned int threadCount = thread::hardware_concurrency();
@@ -53,7 +52,7 @@ void FractalRenderer::generateMultiThreadedCPU(vector<Color>& buffer) {
         // for thread i, render a specific group of pixels
         threads.push_back(std::thread([&buffer, offset, pixelsPerThread, this]() {
 
-            calculatePixelGroup(buffer, offset, pixelsPerThread);
+            renderPixels(buffer, offset, pixelsPerThread);
 
         }));
 
@@ -66,56 +65,138 @@ void FractalRenderer::generateMultiThreadedCPU(vector<Color>& buffer) {
 
 }
 
-void FractalRenderer::generateGPU(vector<Color>& buffer) {}
+void FractalRenderer::renderPixels(char* buffer, unsigned int offset, unsigned int pixelCount) {
 
-void FractalRenderer::calculatePixelGroup(vector<Color>& buffer, unsigned int offset, unsigned int pixelCount) {
+    switch (fractalType) {
+
+    case FractalType::MANDELBROT:
+        renderMandelbrotSet(buffer, offset, pixelCount);
+        break;
+
+    case FractalType::JULIA:
+        renderJuliaSet(buffer, offset, pixelCount);
+        break;
+
+    }
+
+}
+
+void FractalRenderer::renderMandelbrotSet(char* buffer, unsigned int offset, unsigned int pixelCount) {
 
     for (int i = offset; i < offset + pixelCount; ++i) {
 
         int x = i % width;
         int y = i / width;
 
-        float x_normalized = (static_cast<float>(x) / static_cast<float>(width));
-        float y_normalized = (static_cast<float>(y) / static_cast<float>(height));
+        size_t pixelStartIndex = 3 * (y * width + x);
 
-        // Slightly increases the size of either x or y to account for non-square aspect ratio
-        if (width > height) {
-            x_normalized *= (static_cast<float>(width) / height);
-        }
-        else {
-            y_normalized *= (static_cast<float>(height) / width);
-        }
+        Vector2 globalCoords = screenCoordToGlobal(x, y);
+        int iteration = mandelbrotSetMath(globalCoords.x, globalCoords.y);
+        Color color = calculateColor(iteration);
 
-        float x_global = (x_normalized - 0.5f) * scale + 0.5f + pos.x;
-        float y_global = (y_normalized - 0.5f) * scale + 0.5f + pos.y;
 
-        complex<float> z{ 0.0f, 0.0f };
-        complex<float> c{ x_global, y_global };
-
-        int iteration = 0;
-        while (iteration <= maxIterations) {
-
-            z = (z * z) + c;
-
-            if (real(z) * real(z) + imag(z) * imag(z) > 4) break;
-            iteration++;
-        }
-
-        Color color = { 0, 0, 0, 255 };
-
-        if (iteration <= maxIterations) {
-
-            float hue = ((float)iteration / (float)maxIterations);
-            unsigned char brightness = static_cast<unsigned char>(255.0f * hue);
-
-            color = { 0, 0, brightness, 255 };
-
-            Vector3 getHue = ColorToHSV(color);
-            color = ColorFromHSV(getHue.x + ((1.0f - hue) * 360.0f), getHue.y, -((getHue.z - 1.0f) * (getHue.z - 1.0f)) + 1);
-
-        }
-
-        buffer[y * width + x] = color;
+        buffer[pixelStartIndex + 0] = color.r;
+        buffer[pixelStartIndex + 1] = color.g;
+        buffer[pixelStartIndex + 2] = color.b;
     }
+
+}
+
+void FractalRenderer::renderJuliaSet(char* buffer, unsigned int offset, unsigned int pixelCount) {
+
+    for (int i = offset; i < offset + pixelCount; ++i) {
+
+        int x = i % width;
+        int y = i / width;
+        size_t pixelStartIndex = 3 * (y * width + x);
+
+        Vector2 globalCoords = screenCoordToGlobal(x, y);
+        int iteration = juliaSetMath(globalCoords.x, globalCoords.y);
+        Color color = calculateColor(iteration);
+
+
+        buffer[pixelStartIndex + 0] = color.r;
+        buffer[pixelStartIndex + 1] = color.g;
+        buffer[pixelStartIndex + 2] = color.b;;
+    }
+
+}
+
+inline Vector2 FractalRenderer::screenCoordToGlobal(float x, float y) {
+
+    float x_normalized = (static_cast<float>(x) / static_cast<float>(width));
+    float y_normalized = (static_cast<float>(y) / static_cast<float>(height));
+
+    // Slightly increases the size of either x or y to account for non-square aspect ratio
+    if (width > height) {
+        float ratio = (static_cast<float>(width) / height);
+        x_normalized *= ratio;
+        x_normalized -= (ratio - 1.0f) / 2.0f;
+    }
+    else {
+        float ratio = (static_cast<float>(height) / width);
+        y_normalized *= ratio;
+        y_normalized -= (ratio - 1.0f) / 2.0f;
+    }
+
+    float x_global = (x_normalized - 0.5f) * scale + 0.5f + pos.x;
+    float y_global = (y_normalized - 0.5f) * scale + 0.5f + pos.y;
+
+    return Vector2{ x_global, y_global };
+
+}
+
+inline int FractalRenderer::mandelbrotSetMath(float x, float y) {
+
+    complex<float> z{ 0.0f, 0.0f };
+    complex<float> c{ x, y };
+
+    int iteration = 0;
+    while (iteration <= maxIterations) {
+
+        z = (z * z) + c;
+
+        if (real(z) * real(z) + imag(z) * imag(z) > 4) break;
+        iteration++;
+    }
+
+    return iteration;
+
+}
+
+inline int FractalRenderer::juliaSetMath(float x, float y) {
+
+    complex<float> z{ x, y };
+    complex<float> c{ juliaC.x, juliaC.y };
+
+    int iteration = 0;
+    while (iteration <= maxIterations) {
+
+        z = (z * z) + c;
+
+        if (real(z) * real(z) + imag(z) * imag(z) > 4) break;
+        iteration++;
+    }
+
+    return iteration;
+
+}
+
+inline Color FractalRenderer::calculateColor(int iteration) {
+
+    Color color = { 0, 0, 0, 255 };
+    if (iteration <= maxIterations) {
+
+        float hue = ((float)iteration / (float)maxIterations);
+        unsigned char brightness = static_cast<unsigned char>(255.0f * hue);
+
+        color = { 0, 0, brightness, 255 };
+
+        Vector3 getHue = ColorToHSV(color);
+        color = ColorFromHSV(getHue.x + ((1.0f - hue) * 360.0f), getHue.y, -((getHue.z - 1.0f) * (getHue.z - 1.0f)) + 1);
+
+    }
+
+    return color;
 
 }

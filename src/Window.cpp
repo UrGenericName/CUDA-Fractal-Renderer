@@ -11,7 +11,7 @@ Window::Window(const char* title, int i_width, int i_height) : width(i_width), h
 	InitWindow(width, height, title);
 	SetTargetFPS(60);
 
-	Image dummyImage = { nullptr, width, height, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8 };
+	Image dummyImage = { nullptr, width, height, 1, PIXELFORMAT_UNCOMPRESSED_R8G8B8 };
 	screenBuffer = LoadTextureFromImage(dummyImage);
 
 }
@@ -25,7 +25,7 @@ Window::~Window() {
 void Window::Draw(FractalRenderer& fractalRenderer) {
 
 	ClearBackground(BLACK);
-	UpdateTexture(screenBuffer, fractalRenderer.buffer.data());
+	UpdateTexture(screenBuffer, fractalRenderer.buffer);
 	DrawTexture(screenBuffer, 0, 0, WHITE);
 
 	ZoomHandler(fractalRenderer);

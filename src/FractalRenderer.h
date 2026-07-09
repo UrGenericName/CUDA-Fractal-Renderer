@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <complex>
 #include "raylib.h"
 
 class Window;
@@ -9,31 +10,46 @@ public:
 	
 	friend Window;
 
+	enum class FractalType {
+		MANDELBROT,
+		JULIA
+	};
+
 	enum class RenderMethod {
 		CPU,
 		CPU_MULTI_THREADED,
 		GPU
 	};
 
-	RenderMethod renderMethod = RenderMethod::CPU_MULTI_THREADED;
 	int maxIterations = 10;
+	FractalType fractalType = FractalType::MANDELBROT;
+	RenderMethod renderMethod = RenderMethod::CPU_MULTI_THREADED;
+
+	Vector2 juliaC{ 0.0f, 0.0f };
 
 	Vector2 pos{ 0.0f, 0.0f };
 	float scale = 1.0f;
 
 	FractalRenderer(int i_width, int i_height);
-	void generate(std::vector<Color>& buffer);
+	void generate(char* buffer);
 	void generate();
 
 private:
-	int width;
-	int height;
+	const int width;
+	const int height;
 
-	void generateCPU(std::vector<Color>& buffer);
-	void generateMultiThreadedCPU(std::vector<Color>& buffer);
-	void generateGPU(std::vector<Color>& buffer);
+	void generateCPU(char* buffer);
+	void generateMultiThreadedCPU(char* buffer);
+	void generateGPU(char* buffer);
 
-	void FractalRenderer::calculatePixelGroup(std::vector<Color>& buffer, unsigned int offset, unsigned int pixelCount);
+	void renderPixels(char* buffer, unsigned int offset, unsigned int pixelCount);
+	void renderMandelbrotSet(char* buffer, unsigned int offset, unsigned int pixelCount);
+	void renderJuliaSet(char* buffer, unsigned int offset, unsigned int pixelCount);
 
-	std::vector<Color> buffer;
+	inline Vector2 screenCoordToGlobal(float x, float y);
+	inline int mandelbrotSetMath(float x, float y);
+	inline int juliaSetMath(float x, float y);
+	inline Color calculateColor(int iteration);
+
+	char* buffer;	// R8G8B8 for each pixel
 };

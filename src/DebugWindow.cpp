@@ -49,6 +49,31 @@ void DebugWindow::Draw(FractalRenderer& fractalRenderer) {
 				ImGui::EndCombo();
 			}
 
+			const char* types[] = { "Mandelbrot Set", "Julia Set" };
+			static int current_type_id = 0;
+
+			if (BeginCombo("Fractal Type", types[current_type_id])) {
+
+				for (int n = 0; n < IM_ARRAYSIZE(types); n++) {
+					const bool is_selected = (current_type_id == n);
+
+					if (ImGui::Selectable(types[n], is_selected)) {
+						current_type_id = n;
+					}
+
+					if (is_selected) {
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+
+				fractalRenderer.fractalType = static_cast<FractalRenderer::FractalType>(current_type_id);
+
+				ImGui::EndCombo();
+			}
+
+			SliderFloat("x", &(fractalRenderer.juliaC.x), -5.0f, 5.0f);
+			SliderFloat("y", &(fractalRenderer.juliaC.y), -5.0f, 5.0f);
+
 			EndTable();
 		}
 
