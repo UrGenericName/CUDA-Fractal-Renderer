@@ -30,7 +30,7 @@ public:
 	Vector2 pos{ 0.0f, 0.0f };
 	float scale = 1.0f;
 
-	FractalRenderer(int i_width, int i_height);
+	FractalRenderer(int i_width, int i_height); // implementation in .cu
 	void generate(char* buffer);
 	void generate();
 
@@ -40,7 +40,7 @@ private:
 
 	void generateCPU(char* buffer);
 	void generateMultiThreadedCPU(char* buffer);
-	void generateGPU(char* buffer);
+	void generateGPU(char* buffer);	// implementation in .cu
 
 	void renderPixels(char* buffer, unsigned int offset, unsigned int pixelCount);
 	void renderMandelbrotSet(char* buffer, unsigned int offset, unsigned int pixelCount);

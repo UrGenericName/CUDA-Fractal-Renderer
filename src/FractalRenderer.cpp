@@ -5,10 +5,6 @@
 
 using namespace std;
 
-FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {
-    buffer = new char[3 * width * height]{0};
-}
-
 void FractalRenderer::generate(char* buffer) {
 
     switch (renderMethod) {
