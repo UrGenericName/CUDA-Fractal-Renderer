@@ -3,7 +3,7 @@
 #include <string>
 #include "raylib.h"
 
-using Real = long double;
+using Real = float;
 
 class Window;
 
@@ -40,6 +40,7 @@ public:
 	void generate();
 
 	void renderImage();
+	void benchmark();
 
 private:
 	const int width;

@@ -89,7 +89,7 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 		const char* items[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
 		static int current_item_id = 0;
 
-		if (BeginCombo("Render Method", items[current_item_id])) {
+		if (BeginCombo("Method", items[current_item_id])) {
 
 			for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
 				const bool is_selected = (current_item_id == n);
@@ -107,6 +107,8 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 
 			ImGui::EndCombo();
 		}
+		
+		if (Button("Benchmark")) fractalRenderer.benchmark();
 
 		if (Button("Render Image")) fractalRenderer.renderImage();
 

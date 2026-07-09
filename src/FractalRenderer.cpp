@@ -1,6 +1,7 @@
 #pragma once
 #include "FractalRenderer.h"
 
+#include <iostream>
 #include <filesystem>
 #include <chrono>
 #include <thread>
@@ -261,4 +262,36 @@ void FractalRenderer::renderImage() {
     stbi_flip_vertically_on_write(true);
     stbi_write_png(destinationCstr, width, height, 3, buffer, width * 3);
 
+}
+
+void FractalRenderer::benchmark() {
+
+    chrono::time_point<chrono::high_resolution_clock> start, end;
+
+    // CPU BENCHMARK
+    start = chrono::high_resolution_clock::now();
+    generateCPU(buffer);
+    end = chrono::high_resolution_clock::now();
+    auto durationCPU = chrono::duration_cast<chrono::microseconds>(end - start);
+
+    // MULTI-THREADED CPU BENCHMARK
+    start = chrono::high_resolution_clock::now();
+    generateMultiThreadedCPU(buffer);
+    end = chrono::high_resolution_clock::now();
+    auto duration_MultiThreaded_CPU = chrono::duration_cast<chrono::microseconds>(end - start);
+
+    // GPU BENCHMARK
+    start = chrono::high_resolution_clock::now();
+    generateGPU(buffer);
+    end = chrono::high_resolution_clock::now();
+    auto duration_GPU = chrono::duration_cast<chrono::microseconds>(end - start);
+
+    cout << endl << endl << endl;
+    cout << "    RENDER METHOD     |  TIME (microseconds)" << endl;
+    cout << "----------------------+--------------------" << endl;
+    cout << "CPU:                  | " + to_string(durationCPU.count()) + " us" << endl;
+    cout << "----------------------+--------------------" << endl;
+    cout << "CPU (multi-threaded): | " + to_string(duration_MultiThreaded_CPU.count()) + " us" << endl;
+    cout << "----------------------+--------------------" << endl;
+    cout << "GPU (CUDA):           | " + to_string(duration_GPU.count()) + " us" << endl;
 }
