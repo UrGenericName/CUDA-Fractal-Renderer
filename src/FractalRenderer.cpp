@@ -12,6 +12,15 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+#ifndef USING_CUDA
+FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {
+
+    size_t N = 3 * width * height;
+    buffer = static_cast<char*>(malloc(N * sizeof(char)));
+
+}
+#endif
+
 void FractalRenderer::generate(char* buffer) {
 
     switch (renderMethod) {
@@ -67,6 +76,8 @@ void FractalRenderer::generateMultiThreadedCPU(char* buffer) {
     }
 
 }
+
+void FractalRenderer::generateGPU(char* buffer) {}
 
 void FractalRenderer::renderPixels(char* buffer, unsigned int offset, unsigned int pixelCount) {
 

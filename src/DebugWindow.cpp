@@ -86,7 +86,11 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 
 		SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
 
+		#ifdef USING_CUDA
 		const char* methods[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
+        #else
+		const char* methods[] = { "CPU", "CPU Multi-threaded" };
+		#endif
 		static int current_item_id = 0;
 
 		if (BeginCombo("Method", methods[current_item_id])) {

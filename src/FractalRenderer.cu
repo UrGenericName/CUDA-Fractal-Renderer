@@ -4,6 +4,8 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
+#define USING_CUDA
+
 __device__ void calculateColorCUDA(int maxIterations, int iteration, char* r, char* g, char* b) {
 
     *r = 0;
