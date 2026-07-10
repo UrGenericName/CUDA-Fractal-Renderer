@@ -7,6 +7,8 @@
 using namespace ImGui;
 using namespace std;
 
+#define USING_CUDA
+
 DebugWindow::DebugWindow() { 
 	assert(IsWindowReady()); // ensures raylib window is initalized first
 	rlImGuiSetup(true); 
