@@ -12,8 +12,6 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-#define USING_CUDA
-
 #ifndef USING_CUDA
 FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {
 
