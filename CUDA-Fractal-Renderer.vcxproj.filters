@@ -31,6 +31,9 @@
     <ClCompile Include="src\DebugWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -47,6 +50,9 @@
     </Filter>
     <Filter Include="rllmGui">
       <UniqueIdentifier>{866ca3b6-7755-4c86-a11a-59e192df8d75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="magic_enum">
+      <UniqueIdentifier>{d37f2f3b-12d9-4810-abc9-b890d10d7b9d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +90,36 @@
       <Filter>rllmGui</Filter>
     </ClInclude>
     <ClInclude Include="src\DebugWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_utility.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_all.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_containers.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_flags.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_format.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_fuse.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_iostream.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="magic_enum\magic_enum_switch.hpp">
+      <Filter>magic_enum</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -36,9 +36,12 @@ public:
 	float scale = 1.0f;
 
 	FractalRenderer(int i_width, int i_height); // implementation in .cu
+
+	FractalRenderer& operator=(const FractalRenderer& other);
+
 	void generate(char* buffer);
 	void generate();
-
+	void renderImage(std::string fileName);
 	void renderImage();
 	void benchmark();
 

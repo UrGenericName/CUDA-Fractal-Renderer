@@ -3,6 +3,7 @@
 
 #include "string"
 #include <typeinfo>
+#include "magic_enum/magic_enum.hpp"
 
 using namespace ImGui;
 using namespace std;
@@ -16,7 +17,7 @@ DebugWindow::~DebugWindow() {
 	rlImGuiShutdown(); 
 }
 
-void DebugWindow::Draw(FractalRenderer& fractalRenderer) {
+void DebugWindow::Draw(FractalRenderer& fractalRenderer, Animation& animationComponent) {
 
 	if (IsKeyPressed(KEY_F)) drawWindow = !drawWindow;
 
@@ -26,6 +27,7 @@ void DebugWindow::Draw(FractalRenderer& fractalRenderer) {
 		DrawViewportInfo(fractalRenderer);
 		DrawRenderSettings(fractalRenderer);
 		DrawFractalSettings(fractalRenderer);
+		DrawAnimationSettings(fractalRenderer, animationComponent);
 	}
 
 	rlImGuiEnd();
@@ -47,6 +49,7 @@ void DebugWindow::DrawViewportInfo(FractalRenderer& fractalRenderer) {
 
 		#endif
 
+		// PRECISION INFO
 		TableNextColumn();
 		string precisionText = string{ "Precision: " } + typeid(Real).name();
 		Text(precisionText.c_str());
@@ -55,24 +58,35 @@ void DebugWindow::DrawViewportInfo(FractalRenderer& fractalRenderer) {
 		float total_width = GetContentRegionAvail().x;
 		float item_width = (total_width - GetStyle().ItemSpacing.x) / 5.0f;
 
+		// POSITION
 		TableNextColumn();
+		double inputPosX = fractalRenderer.posX;
+		double inputPosY = fractalRenderer.posY;
+
 		SetNextItemWidth(item_width);
 		Text("(x, y): ");
 		SameLine();
 		SetNextItemWidth(item_width);
-		Text(to_string(fractalRenderer.posX).c_str());
+		InputDouble("##posX", &(inputPosX));
 		SameLine();
 		SetNextItemWidth(item_width);
-		Text(to_string(fractalRenderer.posY).c_str());
+		InputDouble("##posY", &(inputPosY));
 
+		fractalRenderer.posX = inputPosX;
+		fractalRenderer.posY = inputPosY;
 		TableNextRow();
 
+		// SCALE
 		TableNextColumn();
+		float inputScale = fractalRenderer.scale;
+
 		SetNextItemWidth(item_width);
-		Text("Scale: ");
+		Text("Scale:  ");
 		SameLine();
 		SetNextItemWidth(item_width);
-		Text(to_string(fractalRenderer.scale).c_str());
+		InputFloat("##scale", &inputScale);
+
+		fractalRenderer.scale = inputScale;
 
 		EndTable();
 
@@ -105,23 +119,21 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 			for (int n = 0; n < IM_ARRAYSIZE(methods); n++) {
 				const bool is_selected = (current_item_id == n);
 
-				if (ImGui::Selectable(methods[n], is_selected)) {
+				if (Selectable(methods[n], is_selected)) {
 					current_item_id = n;
 				}
 
 				if (is_selected) {
-					ImGui::SetItemDefaultFocus();
+					SetItemDefaultFocus();
 				}
 			}
 
 			fractalRenderer.renderMethod = static_cast<FractalRenderer::RenderMethod>(current_item_id);
 
-			ImGui::EndCombo();
+			EndCombo();
 		}
 		
 		if (Button("Benchmark")) fractalRenderer.benchmark();
-		SameLine();
-		if (Button("Render Image")) fractalRenderer.renderImage();
 
 		EndTable();
 
@@ -148,18 +160,18 @@ void DebugWindow::DrawFractalSettings(FractalRenderer& fractalRenderer) {
 			for (int n = 0; n < IM_ARRAYSIZE(types); n++) {
 				const bool is_selected = (current_type_id == n);
 
-				if (ImGui::Selectable(types[n], is_selected)) {
+				if (Selectable(types[n], is_selected)) {
 					current_type_id = n;
 				}
 
 				if (is_selected) {
-					ImGui::SetItemDefaultFocus();
+					SetItemDefaultFocus();
 				}
 			}
 
 			fractalRenderer.fractalType = static_cast<FractalRenderer::FractalType>(current_type_id);
 
-			ImGui::EndCombo();
+			EndCombo();
 		}
 
 		if (fractalRenderer.fractalType == FractalRenderer::FractalType::JULIA) {
@@ -183,6 +195,66 @@ void DebugWindow::DrawFractalSettings(FractalRenderer& fractalRenderer) {
 			fractalRenderer.juliaCy = inputJuliaY;
 
 		}
+
+		EndTable();
+	}
+
+}
+
+void DebugWindow::DrawAnimationSettings(FractalRenderer& fractalRenderer, Animation& animationComponent) {
+
+	if (BeginTable("##AnimationSettingsTable", 1)) {
+
+		TableSetupColumn("Animation Settings");
+		TableHeadersRow();
+
+
+
+		TableNextColumn();
+		BeginDisabled(animationComponent.animationPreviewPhase != Animation::AnimationPhase::COMPLETE || animationComponent.animationVideoPhase != Animation::AnimationPhase::COMPLETE);
+
+		if (Button("Render Image")) fractalRenderer.renderImage();
+		SameLine();
+		if (Button("Render Video")) animationComponent.animationVideoPhase = Animation::AnimationPhase::ANIMATING;
+
+		SliderInt("Frames", &animationComponent.totalFrames, 1, 1000);
+
+
+		constexpr auto enumNames = magic_enum::enum_names<Animation::Animations>();
+
+		std::array<const char*, enumNames.size()> animations;
+		for (size_t i = 0; i < enumNames.size(); ++i) {
+			animations[i] = enumNames[i].data();
+		}
+		
+		int current_item_id = static_cast<int>(animationComponent.animation);
+
+		if (BeginCombo("Animation", animations[current_item_id])) {
+
+			for (int n = 0; n < static_cast<int>(animations.size()); n++) {
+				const bool is_selected = (current_item_id == n);
+
+				if (Selectable(animations[n], is_selected)) {
+					current_item_id = n;
+				}
+
+				if (is_selected) {
+					SetItemDefaultFocus();
+				}
+			}
+
+			animationComponent.animation = static_cast<Animation::Animations>(current_item_id);
+
+			EndCombo();
+		}
+
+
+		if (Button("Preview")) animationComponent.animationPreviewPhase = Animation::AnimationPhase::ANIMATING;
+
+		EndDisabled();
+
+		SameLine();
+		Text("Frame: %d/%d", animationComponent.currentFrame, animationComponent.totalFrames);
 
 		EndTable();
 	}

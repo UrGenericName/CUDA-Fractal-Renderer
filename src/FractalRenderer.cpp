@@ -21,6 +21,24 @@ FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), he
 }
 #endif
 
+FractalRenderer& FractalRenderer::operator=(const FractalRenderer& other) {
+
+    maxIterations = other.maxIterations;
+    fractalType = other.fractalType;
+    renderMethod = other.renderMethod;
+
+    juliaCx = other.juliaCx;
+    juliaCy = other.juliaCy;
+
+    posX = other.posX;
+    posY = other.posY;
+
+    scale = other.scale;
+
+    return *this;
+
+}
+
 void FractalRenderer::generate(char* buffer) {
 
     switch (renderMethod) {
@@ -144,48 +162,40 @@ void FractalRenderer::renderJuliaSet(char* buffer, unsigned int offset, unsigned
 
 void FractalRenderer::screenCoordToGlobal(Real x, Real y, Real* x_global, Real* y_global) {
 
-    Real x_normalized = (static_cast<Real>(x) / static_cast<Real>(width));
-    Real y_normalized = (static_cast<Real>(y) / static_cast<Real>(height));
+    Real x_normalized = (static_cast<Real>(x) / static_cast<Real>(width)) * 2.0f - 1.0f;
+    Real y_normalized = (static_cast<Real>(y) / static_cast<Real>(height)) * 2.0f - 1.0f;
 
     // Slightly increases the size of either x or y to account for non-square aspect ratio
     if (width > height) {
         Real ratio = (static_cast<Real>(width) / height);
         x_normalized *= ratio;
-        x_normalized -= (ratio - 1.0f) / 2.0f;
     }
     else {
         Real ratio = (static_cast<Real>(height) / width);
         y_normalized *= ratio;
-        y_normalized -= (ratio - 1.0f) / 2.0f;
     }
 
-    *x_global = (x_normalized - 0.5f) * scale + 0.5f + posX;
-    *y_global = (y_normalized - 0.5f) * scale + 0.5f + posY;
+    *x_global = x_normalized * scale + posX;
+    *y_global = y_normalized * scale + posY;
 
 }
 
-void FractalRenderer::globalCoordToScreen(Real x, Real y, Real* x_screen, Real* y_screen) {
+void FractalRenderer::globalCoordToScreen(Real x_global, Real y_global, Real* x_screen, Real* y_screen) {
 
-    // Reverse the position offset and scale scaling
-    Real x_normalized = (x - posX - 0.5f) / scale + 0.5f;
-    Real y_normalized = (y - posY - 0.5f) / scale + 0.5f;
+    Real x_normalized = (x_global - posX) / scale;
+    Real y_normalized = (y_global - posY) / scale;
 
-    // Reverse the aspect ratio centering adjustments
     if (width > height) {
         Real ratio = (static_cast<Real>(width) / height);
-        x_normalized += (ratio - 1.0f) / 2.0f;
         x_normalized /= ratio;
     }
     else {
         Real ratio = (static_cast<Real>(height) / width);
-        y_normalized += (ratio - 1.0f) / 2.0f;
         y_normalized /= ratio;
     }
 
-    // Reverse the normalization to map back to pixel dimensions
-    *x_screen = x_normalized * static_cast<Real>(width);
-    *y_screen = y_normalized * static_cast<Real>(height);
-
+    *x_screen = ((x_normalized + 1.0f) / 2.0f) * static_cast<Real>(width);
+    *y_screen = ((y_normalized + 1.0f) / 2.0f) * static_cast<Real>(height);
 }
 
 inline int FractalRenderer::mandelbrotSetMath(int maxIterations, Real x, Real y) {
@@ -262,12 +272,7 @@ inline Color FractalRenderer::calculateColor(int maxIterations, int iteration) {
 
 }
 
-void FractalRenderer::renderImage() {
-
-    auto now = chrono::system_clock::now();
-    auto local_time = chrono::current_zone()->to_local(now);
-    string timeStamp = format("{:%Y-%m-%d_%H-%M-%S}", local_time);
-    string fileName = "output_" + timeStamp + ".png";
+void FractalRenderer::renderImage(string fileName) {
 
     fs::create_directories("output");
     fs::path destination = string("output/" + fileName);
@@ -276,6 +281,17 @@ void FractalRenderer::renderImage() {
 
     stbi_flip_vertically_on_write(true);
     stbi_write_png(destinationCstr, width, height, 3, buffer, width * 3);
+
+}
+
+void FractalRenderer::renderImage() {
+
+    auto now = chrono::system_clock::now();
+    auto local_time = chrono::current_zone()->to_local(now);
+    string timeStamp = format("{:%Y-%m-%d_%H-%M-%S}", local_time);
+    string fileName = "output_" + timeStamp + ".png";
+
+    renderImage(fileName);
 
 }
 
