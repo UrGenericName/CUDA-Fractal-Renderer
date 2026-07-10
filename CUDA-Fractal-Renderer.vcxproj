@@ -115,4 +115,15 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets')" />
   </ImportGroup>
+
+	<ItemDefinitionGroup Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets')">
+		<ClCompile>
+			<!-- Append your macro directly to the preprocessor definitions -->
+			<PreprocessorDefinitions>HAS_CUDA_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+		</ClCompile>
+		<CudaCompile>
+			<PreprocessorDefinitions>HAS_CUDA_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+		</CudaCompile>
+	</ItemDefinitionGroup>
+	
 </Project>
