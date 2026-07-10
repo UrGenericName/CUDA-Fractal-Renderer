@@ -160,10 +160,10 @@ void FractalRenderer::renderJuliaSet(char* buffer, unsigned int offset, unsigned
 
 }
 
-void FractalRenderer::screenCoordToGlobal(Real x, Real y, Real* x_global, Real* y_global) {
+void FractalRenderer::screenCoordToGlobal(Real x_screen, Real y_screen, Real* x_global, Real* y_global) {
 
-    Real x_normalized = (static_cast<Real>(x) / static_cast<Real>(width)) * 2.0f - 1.0f;
-    Real y_normalized = (static_cast<Real>(y) / static_cast<Real>(height)) * 2.0f - 1.0f;
+    Real x_normalized = (static_cast<Real>(x_screen) / static_cast<Real>(width)) * 2.0f - 1.0f;
+    Real y_normalized = -((static_cast<Real>(y_screen) / static_cast<Real>(height)) * 2.0f - 1.0f);
 
     // Slightly increases the size of either x or y to account for non-square aspect ratio
     if (width > height) {
@@ -183,7 +183,7 @@ void FractalRenderer::screenCoordToGlobal(Real x, Real y, Real* x_global, Real* 
 void FractalRenderer::globalCoordToScreen(Real x_global, Real y_global, Real* x_screen, Real* y_screen) {
 
     Real x_normalized = (x_global - posX) / scale;
-    Real y_normalized = (y_global - posY) / scale;
+    Real y_normalized = -(y_global - posY) / scale;
 
     if (width > height) {
         Real ratio = (static_cast<Real>(width) / height);

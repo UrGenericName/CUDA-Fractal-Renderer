@@ -96,7 +96,7 @@ void Window::ZoomHandler(FractalRenderer& fractalRenderer) {
 
 		Vector2 currentCursorPos = GetMousePosition();
 
-		Vector2 cursor_diff_normalized = { (initalCursorPos.x - currentCursorPos.x) / width * 2.0f, (initalCursorPos.y - currentCursorPos.y) / height * 2.0f };
+		Vector2 cursor_diff_normalized = { (initalCursorPos.x - currentCursorPos.x) / width * 2.0f, -(initalCursorPos.y - currentCursorPos.y) / height * 2.0f };
 
 
 		if (width > height) {

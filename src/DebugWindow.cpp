@@ -217,7 +217,7 @@ void DebugWindow::DrawAnimationSettings(FractalRenderer& fractalRenderer, Animat
 		SameLine();
 		if (Button("Render Video")) animationComponent.animationVideoPhase = Animation::AnimationPhase::ANIMATING;
 
-		SliderInt("Frames", &animationComponent.totalFrames, 1, 1000);
+		SliderInt("Frames", &animationComponent.totalFrames, 1, 600);
 
 
 		constexpr auto enumNames = magic_enum::enum_names<Animation::Animations>();

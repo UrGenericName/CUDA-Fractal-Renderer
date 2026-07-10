@@ -25,7 +25,7 @@ public:
 	AnimationPhase animationPreviewPhase = AnimationPhase::COMPLETE;
 
 	int currentFrame = 0;
-	int totalFrames = 50;
+	int totalFrames = 60;
 
 	void Animate(FractalRenderer& fractalRenderer);
 
