@@ -33,9 +33,11 @@ void FractalRenderer::generate(char* buffer) {
         generateMultiThreadedCPU(buffer);
         break;
 
+    #ifdef USING_CUDA
     case RenderMethod::GPU:
         generateGPU(buffer);
         break;
+    #endif
 
     }
 }
@@ -292,10 +294,12 @@ void FractalRenderer::benchmark() {
     auto duration_MultiThreaded_CPU = chrono::duration_cast<chrono::microseconds>(end - start);
 
     // GPU BENCHMARK
+    #ifdef USING_CUDA
     start = chrono::high_resolution_clock::now();
     generateGPU(buffer);
     end = chrono::high_resolution_clock::now();
     auto duration_GPU = chrono::duration_cast<chrono::microseconds>(end - start);
+    #endif
 
     cout << endl << endl << endl;
     cout << "    RENDER METHOD     |  TIME (microseconds)" << endl;
@@ -303,6 +307,9 @@ void FractalRenderer::benchmark() {
     cout << "CPU:                  | " + to_string(durationCPU.count()) + " us" << endl;
     cout << "----------------------+--------------------" << endl;
     cout << "CPU (multi-threaded): | " + to_string(duration_MultiThreaded_CPU.count()) + " us" << endl;
+
+    #ifdef USING_CUDA
     cout << "----------------------+--------------------" << endl;
     cout << "GPU (CUDA):           | " + to_string(duration_GPU.count()) + " us" << endl;
+    #endif
 }

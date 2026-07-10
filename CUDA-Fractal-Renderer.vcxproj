@@ -30,7 +30,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props')"/>
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props')" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -47,13 +47,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)imgui;$(ProjectDir)rllmGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)imgui;$(ProjectDir)rllmGui;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-		<AdditionalDependencies Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props')">cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props')">cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
@@ -67,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)imgui;$(ProjectDir)rllmGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)imgui;$(ProjectDir)rllmGui;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -75,7 +75,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-	  <AdditionalDependencies Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props')">cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.props')">cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CudaCompile>
@@ -113,6 +113,6 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets')"/>
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets" Condition="Exists('$(VCTargetsPath)\BuildCustomizations\CUDA 13.2.targets')" />
   </ImportGroup>
 </Project>

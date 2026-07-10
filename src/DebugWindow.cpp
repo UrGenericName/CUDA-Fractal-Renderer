@@ -39,6 +39,13 @@ void DebugWindow::DrawViewportInfo(FractalRenderer& fractalRenderer) {
 		TableSetupColumn("Viewport");
 		TableHeadersRow();
 
+		#ifndef USING_CUDA
+
+		TableNextColumn();
+		TextColored(ImVec4(1.0f, 0.7f, 0.2f, 1.0f), "* CUDA not installed");
+		TableNextRow();
+
+		#endif
 
 		TableNextColumn();
 		string precisionText = string{ "Precision: " } + typeid(Real).name();
