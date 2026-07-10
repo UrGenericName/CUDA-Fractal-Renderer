@@ -74,25 +74,23 @@ __device__ int juliaSetMathCUDA(int maxIterations, Real x, Real y, Real juliaCx,
 
 }
 
-__device__ void screenCoordToGlobalCUDA(int width, int height, float scale, Real posX, Real posY, Real x, Real y, Real* x_global, Real* y_global) {
+__device__ void screenCoordToGlobalCUDA(int width, int height, float scale, Real posX, Real posY, Real x_screen, Real y_screen, Real* x_global, Real* y_global) {
 
-    Real x_normalized = (static_cast<Real>(x) / static_cast<Real>(width));
-    Real y_normalized = (static_cast<Real>(y) / static_cast<Real>(height));
+    Real x_normalized = (static_cast<Real>(x_screen) / static_cast<Real>(width)) * 2.0f - 1.0f;
+    Real y_normalized = -((static_cast<Real>(y_screen) / static_cast<Real>(height)) * 2.0f - 1.0f);
 
     // Slightly increases the size of either x or y to account for non-square aspect ratio
     if (width > height) {
         Real ratio = (static_cast<Real>(width) / height);
         x_normalized *= ratio;
-        x_normalized -= (ratio - 1.0f) / 2.0f;
     }
     else {
         Real ratio = (static_cast<Real>(height) / width);
         y_normalized *= ratio;
-        y_normalized -= (ratio - 1.0f) / 2.0f;
     }
 
-    *x_global = (x_normalized - 0.5f) * scale + 0.5f + posX;
-    *y_global = (y_normalized - 0.5f) * scale + 0.5f + posY;
+    *x_global = x_normalized * scale + posX;
+    *y_global = y_normalized * scale + posY;
 
 }
 

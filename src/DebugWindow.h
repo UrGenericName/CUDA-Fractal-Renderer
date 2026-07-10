@@ -5,7 +5,7 @@
 #include "FractalRenderer.h"
 #include "Animation.h"
 
-#define MAX_ITERATIONS_MAX_VALUE 1000
+#define MAX_ITERATIONS_MAX_VALUE 2000
 
 class DebugWindow {
 public:

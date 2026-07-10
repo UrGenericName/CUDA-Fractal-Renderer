@@ -118,8 +118,15 @@ void Animation::zoom(FractalRenderer& fractalRenderer) {
 
 	// Sn = S0 * c^n
 	// (Scale of frame n = scale inital * constant^frame n)
-	static float c;
-	c = pow((finalScale / initalScale), (1.0 / totalFrames));
+	float c = pow((finalScale / initalScale), (1.0 / totalFrames));
 	fractalRenderer.scale = initalScale * pow(c, currentFrame);
+
+	int initalIteration = 110;
+	int finalIteration = 2000;
+
+	c = pow((finalIteration / initalIteration), (1.0 / totalFrames));
+	fractalRenderer.maxIterations = initalIteration * pow(c, currentFrame);
+
+
 
 }

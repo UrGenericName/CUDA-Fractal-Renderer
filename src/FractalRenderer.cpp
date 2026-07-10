@@ -131,7 +131,6 @@ void FractalRenderer::renderMandelbrotSet(char* buffer, unsigned int offset, uns
         int iteration = mandelbrotSetMath(maxIterations, globalX, globalY);
         Color color = calculateColor(maxIterations, iteration);
 
-
         buffer[pixelStartIndex + 0] = color.r;
         buffer[pixelStartIndex + 1] = color.g;
         buffer[pixelStartIndex + 2] = color.b;
@@ -258,7 +257,7 @@ inline Color FractalRenderer::calculateColor(int maxIterations, int iteration) {
     Color color = { 0, 0, 0, 255 };
     if (iteration <= maxIterations) {
 
-        float hue = ((float)iteration / (float)maxIterations);
+        float hue = (float)iteration / (float)maxIterations;
         unsigned char brightness = static_cast<unsigned char>(255.0f * hue);
 
         color = { 0, 0, brightness, 255 };

@@ -3,7 +3,7 @@
 #include <string>
 #include "raylib.h"
 
-using Real = long double;
+using Real = float;
 
 class Window;
 
@@ -25,7 +25,7 @@ public:
 
 	int maxIterations = 10;
 	FractalType fractalType = FractalType::MANDELBROT;
-	RenderMethod renderMethod = RenderMethod::CPU_MULTI_THREADED;
+	RenderMethod renderMethod = RenderMethod::CPU;
 
 	Real juliaCx = 0.0f;
 	Real juliaCy = 0.0f;
