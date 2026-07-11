@@ -4,8 +4,6 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-#define USING_CUDA
-
 __device__ void calculateColorCUDA(int maxIterations, int iteration, char* r, char* g, char* b) {
 
     *r = 0;
@@ -132,30 +130,34 @@ __global__ void renderJuliaSetCUDA(char* buffer, int width, int height, Real sca
 
 }
 
+FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {
+
+    size_t N = 3 * width * height;
+    buffer = static_cast<char*>(malloc(N * sizeof(char)));
+    cudaMalloc(&d_buffer, N * sizeof(char));
+
+}
+
 void FractalRenderer::generateGPU(char* buffer) {
+
+    size_t N = 3 * width * height;
 
     switch (fractalType) {
 
     case FractalType::MANDELBROT:
         cudaDeviceSynchronize();
-        renderMandelbrotSetCUDA<<<width, height>>>(buffer, width, height, scale, posX, posY, maxIterations);
+        renderMandelbrotSetCUDA<<<width, height>>>(d_buffer, width, height, scale, posX, posY, maxIterations);
+        cudaMemcpy(buffer, d_buffer, N * sizeof(char), cudaMemcpyDeviceToHost);
         cudaDeviceSynchronize();
         break;
 
     case FractalType::JULIA:
         cudaDeviceSynchronize();
-        renderJuliaSetCUDA<<<width, height >>>(buffer, width, height, scale, posX, posY, juliaCx, juliaCy, maxIterations);
+        renderJuliaSetCUDA<<<width, height >>>(d_buffer, width, height, scale, posX, posY, juliaCx, juliaCy, maxIterations);
+        cudaMemcpy(buffer, d_buffer, N * sizeof(char), cudaMemcpyDeviceToHost);
         cudaDeviceSynchronize();
         break;
 
     }
-
-}
-
-FractalRenderer::FractalRenderer(int i_width, int i_height) : width(i_width), height(i_height) {
-
-    size_t N = 3 * width * height;
-    cudaMallocManaged(&buffer, N * sizeof(char));
-    //buffer = static_cast<char*>(malloc(N * sizeof(char)));
 
 }

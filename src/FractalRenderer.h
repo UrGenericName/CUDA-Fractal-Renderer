@@ -3,7 +3,7 @@
 #include <string>
 #include "raylib.h"
 
-using Real = float;
+using Real = long double;
 
 class Window;
 
@@ -23,7 +23,7 @@ public:
 		GPU
 	};
 
-	int maxIterations = 10;
+	int maxIterations = 40;
 	FractalType fractalType = FractalType::MANDELBROT;
 	RenderMethod renderMethod = RenderMethod::CPU;
 
@@ -65,4 +65,5 @@ private:
 	inline Color calculateColor(int maxIterations, int iteration);
 
 	char* buffer;	// R8G8B8 for each pixel
+	char* d_buffer; // used in CUDA if installed
 };
