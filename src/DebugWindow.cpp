@@ -105,7 +105,21 @@ void DebugWindow::DrawRenderSettings(FractalRenderer& fractalRenderer) {
 
 		TableNextColumn();
 
+		Checkbox("Dynamic Iterations", &fractalRenderer.dynamicIterations);
+
+		if (fractalRenderer.dynamicIterations) {
+			TableNextRow();
+			TableNextColumn();
+			SliderFloat("c", &fractalRenderer.dynamicIterations_c, 0.0f, MAX_DYNAMIC_ITERATIONS_C_MAX_VALUE);
+		}
+
+		BeginDisabled(fractalRenderer.dynamicIterations);
+		TableNextRow();
+		TableNextColumn();
 		SliderInt("Iterations", &(fractalRenderer.maxIterations), 0, MAX_ITERATIONS_MAX_VALUE);
+		EndDisabled();
+
+		Spacing();
 
 		#ifdef USING_CUDA
 		const char* methods[] = { "CPU", "CPU Multi-threaded", "GPU (CUDA)" };
@@ -217,7 +231,7 @@ void DebugWindow::DrawAnimationSettings(FractalRenderer& fractalRenderer, Animat
 		SameLine();
 		if (Button("Render Video")) animationComponent.animationVideoPhase = Animation::AnimationPhase::ANIMATING;
 
-		SliderInt("Frames", &animationComponent.totalFrames, 1, 600);
+		SliderInt("Frames", &animationComponent.totalFrames, 1, MAX_FRAMES_MAX_VALUE);
 
 
 		constexpr auto enumNames = magic_enum::enum_names<Animation::Animations>();

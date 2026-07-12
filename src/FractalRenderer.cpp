@@ -61,7 +61,11 @@ void FractalRenderer::generate(char* buffer) {
 }
 
 void FractalRenderer::generate() {
+
+    if (dynamicIterations) maxIterations = -log(scale) * dynamicIterations_c + 50;
+
     generate(this->buffer);
+
 }
 
 void FractalRenderer::generateCPU(char* buffer) {
@@ -257,7 +261,7 @@ inline Color FractalRenderer::calculateColor(int maxIterations, int iteration) {
     Color color = { 0, 0, 0, 255 };
     if (iteration <= maxIterations) {
 
-        float hue = (float)iteration / (float)maxIterations;
+        float hue = ((float)iteration)/ (float)maxIterations;
         unsigned char brightness = static_cast<unsigned char>(255.0f * hue);
 
         color = { 0, 0, brightness, 255 };

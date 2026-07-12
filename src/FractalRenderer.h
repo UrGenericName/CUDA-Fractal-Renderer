@@ -23,7 +23,7 @@ public:
 		GPU
 	};
 
-	int maxIterations = 40;
+	int maxIterations = 50;
 	FractalType fractalType = FractalType::MANDELBROT;
 	RenderMethod renderMethod = RenderMethod::CPU;
 
@@ -33,6 +33,8 @@ public:
 	Real posX = 0.0f;
 	Real posY = 0.0f;
 
+	bool dynamicIterations = false;
+	float dynamicIterations_c = 75.0f;
 	float scale = 1.0f;
 
 	FractalRenderer(int i_width, int i_height); // implementation in .cu

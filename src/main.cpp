@@ -9,7 +9,7 @@
 
 void main() {
 
-	Window window { "Fractal Renderer", 860 * 2, 480 * 2 };
+	Window window { "Fractal Renderer", 860, 480 };
 	DebugWindow debugWindow;
 
 	FractalRenderer fractalRenderer{ window.width, window.height};
