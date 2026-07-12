@@ -34,7 +34,8 @@ public:
 	Real posY = 0.0f;
 
 	bool dynamicIterations = false;
-	float dynamicIterations_c = 75.0f;
+	float dynamicIterations_c = 55.0f;
+	float dynamicIterations_min = 50.0f;
 	float scale = 1.0f;
 
 	FractalRenderer(int i_width, int i_height); // implementation in .cu
@@ -65,6 +66,8 @@ private:
 	inline int mandelbrotSetMath(int maxIterations, Real x, Real y);
 	inline int juliaSetMath(int maxIterations, Real x, Real y, Real juliaCx, Real juliaCy);
 	inline Color calculateColor(int maxIterations, int iteration);
+	inline Vector3 colorToHSV(Color color);
+	inline Color HSVtoColor(Vector3 HSV);
 
 	char* buffer;	// R8G8B8 for each pixel
 	char* d_buffer; // used in CUDA if installed

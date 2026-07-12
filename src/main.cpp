@@ -1,8 +1,8 @@
 #pragma once
 #include <iostream>
+#include "raylib.h"
 
 #include "Window.h"
-#include "raylib.h"
 #include "DebugWindow.h"
 #include "FractalRenderer.h"
 #include "Animation.h"
@@ -22,6 +22,7 @@ void main() {
 
 		BeginDrawing();
 		window.Draw(fractalRenderer);
+
 		debugWindow.Draw(fractalRenderer, animationComponent);
 		EndDrawing();
 	}

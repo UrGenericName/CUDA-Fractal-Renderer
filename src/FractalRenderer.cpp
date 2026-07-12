@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <chrono>
 #include <thread>
+#include <algorithm>
+#include <cmath>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -62,7 +64,7 @@ void FractalRenderer::generate(char* buffer) {
 
 void FractalRenderer::generate() {
 
-    if (dynamicIterations) maxIterations = -log(scale) * dynamicIterations_c + 50;
+    if (dynamicIterations) maxIterations = max(-log(scale) * dynamicIterations_c + dynamicIterations_min, dynamicIterations_min);
 
     generate(this->buffer);
 
@@ -266,12 +268,110 @@ inline Color FractalRenderer::calculateColor(int maxIterations, int iteration) {
 
         color = { 0, 0, brightness, 255 };
 
-        Vector3 getHue = ColorToHSV(color);
-        color = ColorFromHSV(getHue.x + ((1.0f - hue) * 360.0f), getHue.y, -((getHue.z - 1.0f) * (getHue.z - 1.0f)) + 1);
+        Vector3 getHue = colorToHSV(color);
+        color = HSVtoColor(Vector3(getHue.x + ((1.0f - hue) * 360.0f), getHue.y, -((getHue.z - 1.0f) * (getHue.z - 1.0f)) + 1));
 
     }
 
     return color;
+
+}
+
+inline Vector3 FractalRenderer::colorToHSV(Color color) {
+
+    int r = color.r;
+    int g = color.g;
+    int b = color.b;
+
+    Vector3 hsv;
+
+    // Normalize RGB
+    double r_prime = r / 255.0f;
+    double g_prime = g / 255.0f;
+    double b_prime = b / 255.0f;
+
+    // Find min and max channels
+    double c_max = max({ r_prime, g_prime, b_prime });
+    double c_min = min({ r_prime, g_prime, b_prime });
+    double delta = c_max - c_min;
+
+    // Calculate Hue
+    if (delta == 0.0f) {
+        hsv.x = 0.0f; // Achromatic case (Gray, White, Black)
+    }
+    else if (c_max == r_prime) {
+        hsv.x = 60.0f * (g_prime - b_prime) / delta;
+    }
+    else if (c_max == g_prime) {
+        hsv.x = 60.0f * (((b_prime - r_prime) / delta) + 2.0f);
+    }
+    else if (c_max == b_prime) {
+        hsv.x = 60.0f * (((r_prime - g_prime) / delta) + 4.0f);
+    }
+
+    // Wrap negative hue angles back into the positive 0-360 range
+    if (hsv.x < 0.0f) {
+        hsv.x += 360.0f;
+    }
+
+    // Calculate Saturation
+    if (c_max == 0.0f) {
+        hsv.y = 0.0f;
+    }
+    else {
+        hsv.y = delta / c_max;
+    }
+
+    // Calculate Value
+    hsv.z = c_max;
+
+    return hsv;
+
+}
+
+inline Color FractalRenderer::HSVtoColor(Vector3 HSV) {
+
+    Color rgb{ 0, 0, 0 };
+
+    float h = HSV.x;
+    float s = HSV.y;
+    float v = HSV.z;
+
+    s = clamp(s, 0.0f, 1.0f);
+    v = clamp(v, 0.0f, 1.0f);
+
+    // Handle wrap-around for the hue angle
+    if (h >= 360.0f) h = fmod(h, 360.0f);
+    if (h < 0.0f)   h = fmod(h, 360.0f) + 360.0f;
+
+    // Determine the sector on the 6-part color wheel (0 to 5)
+    double sector_float = h / 60.0f;
+    int sector = static_cast<int>(std::floor(sector_float));
+    double fractional_part = sector_float - sector;
+
+    double p = v * (1.0f - s);
+    double q = v * (1.0f - (s * fractional_part));
+    double t = v * (1.0f - (s * (1.0f - fractional_part)));
+
+    double r_prime = 0.0f, g_prime = 0.0f, b_prime = 0.0f;
+
+    // Assign primary and secondary colors depending on the hue sector
+    switch (sector) {
+    case 0: r_prime = v; g_prime = t; b_prime = p; break; // Red/Yellow sector
+    case 1: r_prime = q; g_prime = v; b_prime = p; break; // Yellow/Green sector
+    case 2: r_prime = p; g_prime = v; b_prime = t; break; // Green/Cyan sector
+    case 3: r_prime = p; g_prime = q; b_prime = v; break; // Cyan/Blue sector
+    case 4: r_prime = t; g_prime = p; b_prime = v; break; // Blue/Magenta sector
+    case 5: r_prime = v; g_prime = p; b_prime = q; break; // Magenta/Red sector
+    default: break;
+    }
+
+    // Scale components back to standard 8-bit integers with rounding (+0.5)
+    rgb.r = static_cast<int>(r_prime * 255.0f + 0.5f);
+    rgb.g = static_cast<int>(g_prime * 255.0f + 0.5f);
+    rgb.b = static_cast<int>(b_prime * 255.0f + 0.5f);
+
+    return rgb;
 
 }
 

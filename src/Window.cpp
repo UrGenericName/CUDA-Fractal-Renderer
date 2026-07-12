@@ -3,8 +3,11 @@
 
 #include "imgui.h"
 #include "rlImGui.h"
+#include <chrono>
+#include <format>
 
 using namespace std;
+using namespace std::chrono;
 
 Window::Window(string i_title, int i_width, int i_height) : title(i_title), width(i_width), height(i_height) {
 	
@@ -24,6 +27,8 @@ Window::~Window() {
 
 void Window::Draw(FractalRenderer& fractalRenderer) {
 
+	static auto start = high_resolution_clock::now();
+
 	ClearBackground(BLACK);
 	UpdateTexture(screenBuffer, fractalRenderer.buffer);
 	DrawTexture(screenBuffer, 0, 0, WHITE);
@@ -31,7 +36,12 @@ void Window::Draw(FractalRenderer& fractalRenderer) {
 	JuliaHandler(fractalRenderer);
 	ZoomHandler(fractalRenderer);
 
-	SetWindowTitle(generateFullTitle().c_str());
+	auto end = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(end - start);
+
+	SetWindowTitle(generateFullTitle(duration.count()).c_str());
+
+	start = end;
 
 }
 
@@ -122,6 +132,22 @@ void Window::ZoomHandler(FractalRenderer& fractalRenderer) {
 
 }
 
-string Window::generateFullTitle() {
-	return title + "     FPS: " + to_string(GetFPS());
+string Window::generateFullTitle(double frameTime) {
+
+	static vector<unsigned int> FPS_avg_vector(0);
+	static unsigned int FPS_vector_sum = 0;
+
+	unsigned int FPS = 1 / (frameTime * pow(10, -6));
+	FPS_avg_vector.push_back(FPS);
+	FPS_vector_sum += FPS;
+
+	string FPS_avg_string = "N/A";
+
+	if (FPS_avg_vector.size() > FPS_AVERAGE_SAMPLES) {
+		FPS_vector_sum -= FPS_avg_vector[0];
+		FPS_avg_vector.erase(FPS_avg_vector.begin());
+		FPS_avg_string = to_string(FPS_vector_sum / FPS_avg_vector.size());
+	}
+
+	return format("{:<20} FPS: {:<8} FPS (avg): {}", title, to_string(FPS), FPS_avg_string);
 }

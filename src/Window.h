@@ -8,6 +8,7 @@
 #define DRAG_ALPHA 100
 #define DRAG_COLOR Color{ 0, 0, 255, DRAG_ALPHA }
 #define DRAG_BORDER_COLOR Color{ 0, 0, 255, 255 }
+#define FPS_AVERAGE_SAMPLES 120
 
 class Window {
 public:
@@ -29,7 +30,7 @@ private:
 	void JuliaHandler(FractalRenderer& fractalRenderer);
 	void SetJuliaCursor(FractalRenderer& fractalRenderer);
 	void DrawJuliaCursor(FractalRenderer& fractalRenderer);
-	std::string generateFullTitle();
+	std::string generateFullTitle(double frameTime = 1.0f);
 
 	std::string title;
 };
