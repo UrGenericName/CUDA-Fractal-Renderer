@@ -249,14 +249,14 @@ void FractalRenderer::generateGPU(char* buffer) {
 
     case FractalType::MANDELBROT:
         cudaDeviceSynchronize();
-        renderMandelbrotSetCUDA<<<numBlocks, threadsPerBlock >>>(d_buffer, width, height, scale, posX, posY, maxIterations);
+        renderMandelbrotSetCUDA<<<numBlocks, threadsPerBlock>>>(d_buffer, width, height, scale, posX, posY, maxIterations);
         cudaMemcpy(buffer, d_buffer, N * sizeof(char), cudaMemcpyDeviceToHost);
         cudaDeviceSynchronize();
         break;
 
     case FractalType::JULIA:
         cudaDeviceSynchronize();
-        renderJuliaSetCUDA<<<width, height >>>(d_buffer, width, height, scale, posX, posY, juliaCx, juliaCy, maxIterations);
+        renderJuliaSetCUDA<<<numBlocks, threadsPerBlock>>>(d_buffer, width, height, scale, posX, posY, juliaCx, juliaCy, maxIterations);
         cudaMemcpy(buffer, d_buffer, N * sizeof(char), cudaMemcpyDeviceToHost);
         cudaDeviceSynchronize();
         break;

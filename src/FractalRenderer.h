@@ -3,7 +3,7 @@
 #include <string>
 #include "raylib.h"
 
-using Real = long double;
+using Real = float;
 
 class Window;
 
