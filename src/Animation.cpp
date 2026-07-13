@@ -49,7 +49,7 @@ void Animation::AnimationVideoHandler(FractalRenderer& fractalRenderer) {
 
 	static string timeStamp;
 
-	if (currentFrame == totalFrames && copy != nullptr) {
+	if (currentFrame >= totalFrames) {
 
 		currentFrame = 0;
 		animationVideoPhase = AnimationPhase::COMPLETE;
@@ -73,8 +73,8 @@ void Animation::AnimationVideoHandler(FractalRenderer& fractalRenderer) {
 
 		string fileName = "video_" + timeStamp + "/" + to_string(currentFrame) + ".png";
 		fractalRenderer.renderImage(fileName);
-
 		executeAnimationFunction(fractalRenderer);
+
 		++currentFrame;
 
 	}

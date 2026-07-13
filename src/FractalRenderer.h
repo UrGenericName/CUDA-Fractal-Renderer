@@ -3,7 +3,7 @@
 #include <string>
 #include "raylib.h"
 
-using Real = float;
+using Real = long double;
 
 class Window;
 
@@ -33,7 +33,7 @@ public:
 	Real posX = 0.0f;
 	Real posY = 0.0f;
 
-	bool dynamicIterations = false;
+	bool dynamicIterations = true;
 	float dynamicIterations_c = 55.0f;
 	float dynamicIterations_min = 50.0f;
 	float scale = 1.0f;

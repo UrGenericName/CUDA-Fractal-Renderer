@@ -7,9 +7,12 @@
 #include "FractalRenderer.h"
 #include "Animation.h"
 
+#define WIDTH 1500 
+#define HEIGHT 960
+
 void main() {
 
-	Window window { "Fractal Renderer", 860, 480 };
+	Window window { "Fractal Renderer", WIDTH, HEIGHT };
 	DebugWindow debugWindow;
 
 	FractalRenderer fractalRenderer{ window.width, window.height};
